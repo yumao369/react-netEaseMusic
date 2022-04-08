@@ -17,10 +17,9 @@ const menu = [{
 function App() {
 
   const renderMenuItem = () => {
-    console.log(menu)
-    return <div>
-      {menu.map((item, index) => <Menu.Item>{item.label}</Menu.Item>)}
-    </div>
+    return menu.map((item, index) => {
+      return <Menu.Item key={index}>{item.label}</Menu.Item>
+    })
   }
 
   return (
