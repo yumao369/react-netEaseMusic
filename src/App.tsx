@@ -1,10 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Redirect } from "react-router-dom";
-import { Layout, Menu } from "antd"
+import { Layout, Menu, Input } from "antd"
+import { MobileOutlined, UserAddOutlined, DownOutlined } from '@ant-design/icons';
 import Home from './pages/home';
 import styles from "./App.module.less"
 
 const { Header, Content, Footer } = Layout
+const { SubMenu } = Menu
+const { Search } = Input
 
 const menu = [{
   label: '发现',
@@ -35,19 +38,28 @@ function App() {
                 </Menu>
               </div>
               <div className={styles.right}>
-                <div>search</div>
+                <Search placeholder='歌单/歌手/歌曲' enterButton />
                 <div className={styles.member}>
-
+                  <div className={styles.noLogin}>
+                    <Menu mode='horizontal' theme='dark'>
+                      <SubMenu title='登陆' >
+                        <Menu.Item icon={<MobileOutlined />}>手机登陆</Menu.Item>
+                        <Menu.Item icon={<UserAddOutlined />}>注册</Menu.Item>
+                      </SubMenu>
+                    </Menu>
+                  </div>
                 </div>
               </div>
             </div>
           </Header>
-          <Content>Content</Content>
-          <Footer>Footer</Footer>
+          <Content className={styles.content}>
+            <Route exact path="/" render={() => <Redirect to="/home" />}></Route>
+            <Route path="/home" component={Home} />
+          </Content>
+          <Footer className={styles.footer}>
+            Ant Design ©2022 Implement By React
+          </Footer>
         </Layout>
-        <Route exact path="/" render={() => <Redirect to="/home" />}></Route>
-        {/**配置路由 */}
-        <Route path="/home" component={Home}></Route>
       </div>
     </Router>
   );
