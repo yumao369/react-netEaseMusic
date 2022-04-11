@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import { Layout, Menu, Input } from "antd"
-import { MobileOutlined, UserAddOutlined, } from '@ant-design/icons';
+import { MobileOutlined, UserAddOutlined } from '@ant-design/icons';
 import Home from './pages/home';
 import styles from "./App.module.less"
 
