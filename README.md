@@ -48,6 +48,9 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 summary:
 1.Restart the project after adding .env file,or it may not work.
 
+still need to work:
+1.the styles of dots of carousel at home page.
+
 obstacles:
 1.How to deal with the less styles,as the less modules in react has an unique global variable name,but for some styles,I want to use the same classname everywhere.
 

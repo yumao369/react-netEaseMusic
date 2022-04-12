@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useEffect } from "react";
-import { BASE_URL } from "../../utils/url";
 import { API } from "../../utils/api";
 import styles from "./index.module.less"
 import { Carousel } from "antd";
 import { Banner } from "../../types/GlobalTypes";
 import WyCarousel from "./component/wyCarousel";
+import { CarouselRef } from "antd/lib/carousel";
 
 export default function Home() {
 
-  const [banners, setBanners] = useState<Banner[]>([])
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const carouselRef = useRef<CarouselRef | null>(null);
 
   useEffect(() => {
     getBanners();
@@ -21,6 +22,14 @@ export default function Home() {
     if (code === 200) {
       setBanners(banners)
     }
+  }
+
+  const prev = () => {
+    carouselRef.current?.prev();
+  }
+
+  const next = () => {
+    carouselRef.current?.next();
   }
 
   const renderCarouselItem = () => {
@@ -36,8 +45,8 @@ export default function Home() {
   }
   return (
     <div className={styles.home}>
-      <WyCarousel>
-        <Carousel autoplay effect="fade">
+      <WyCarousel prev={prev} next={next}>
+        <Carousel autoplay effect="fade" ref={carouselRef}>
           {renderCarouselItem()}
         </Carousel>
       </WyCarousel>
