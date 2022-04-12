@@ -1,5 +1,65 @@
-
+@import "../../assets/styles/varibles.less";
 .bannerItem{
   display: block;
   width: 100%;
+}
+
+.wrap{
+  display: flex;
+  justify-content: space-between;
+  background-color: @white-color;
+  border-left: 1px solid @border-color-base;
+  border-right: 1px solid @border-color-base;
+}
+
+.left{
+  width: 726px;
+  padding: 20px 20px 40px;
+}
+
+.up{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 10px 10px 10px;
+  border-bottom: 2px solid @red-color;
+  margin-bottom: 15px;
+}
+
+.navs{
+  display: flex;
+  align-items: flex-end;
+}
+
+
+.hotTagTitle{
+  font-size: @font-size-lgs;
+}
+
+.symbol{
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-color: @white-color;
+  border:3px solid @red-color;
+  border-radius: 50%;
+  margin-right: 10px;                
+}
+
+.titleName:hover{
+  text-decoration: inherit;
+}
+
+.hotTagItem{
+  display: inline-block;
+  padding: 0 12px;
+  border-right: 1px solid @border-color-base;
+  //margin-left: 15px;
+  &:last-child{
+    border-right: none;
+  }
+}
+
+.more{
+  border: none;
 }
