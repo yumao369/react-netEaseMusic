@@ -568,6 +568,30 @@ module.exports = function (webpackEnv) {
                 'less-loader'
               ),
             },
+            {
+              test: /\.(less)$/,
+              use: [
+                'style-loader',
+                {
+                  loader: 'less-loader',
+                  options: {
+                    importLoaders: 1,
+                    modules: {
+                      localIdentName: "[name]__[local]___[hash:base64:5]",
+                    },
+                  }
+                }
+              ],
+              include: /\.module\.less$/
+            },
+            {
+              test: /\.(less)$/,
+              use: [
+                'style-loader',
+                'less-loader'
+              ],
+              exclude: /\.module\.less$/
+            },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
             // In production, they would get copied to the `build` folder.

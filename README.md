@@ -47,3 +47,11 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 summary:
 1.Restart the project after adding .env file,or it may not work.
+
+obstacles:
+1.How to deal with the less styles,as the less modules in react has an unique global variable name,but for some styles,I want to use the same classname everywhere.
+
+solutions:
+1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
+  https://angular.io/guide/view-encapsulation#inspect-generated-css
+  for example:in component wyCarousel,for the second div,we need it to be displayed as a wrap.We already have .wrap class that could be used every,but we have some unique styles for this particular wrap,so we can make it possibel like what I have done.

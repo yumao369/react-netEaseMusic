@@ -5,6 +5,7 @@ import { API } from "../../utils/api";
 import styles from "./index.module.less"
 import { Carousel } from "antd";
 import { Banner } from "../../types/GlobalTypes";
+import WyCarousel from "./component/wyCarousel";
 
 export default function Home() {
 
@@ -35,11 +36,11 @@ export default function Home() {
   }
   return (
     <div className={styles.home}>
-      <div className={[styles.carousel, styles.wrap].join(' ')}>
+      <WyCarousel>
         <Carousel autoplay effect="fade">
           {renderCarouselItem()}
         </Carousel>
-      </div>
+      </WyCarousel>
     </div>
   )
 }
