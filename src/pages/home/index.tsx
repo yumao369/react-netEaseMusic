@@ -7,6 +7,7 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { Banner, HotTag, SongSheet } from "../../types/GlobalTypes";
 import WyCarousel from "./component/wyCarousel";
 import { CarouselRef } from "antd/lib/carousel";
+import SingleSheet from "../../components/wyUi/singleSheet";
 
 export default function Home() {
 
@@ -32,9 +33,8 @@ export default function Home() {
   const getHotTags = async () => {
     const res = await API.get('/playlist/hot');
     const { code, tags } = res.data;
-    const hotTags = tags.sort((x: HotTag, y: HotTag) => x.position - y.position).slice(0, 5)
-    console.log('hottags', hotTags)
     if (code === 200) {
+      const hotTags = tags.sort((x: HotTag, y: HotTag) => x.position - y.position).slice(0, 5)
       setHotTags(hotTags)
     }
   }
@@ -43,8 +43,8 @@ export default function Home() {
     const res = await API.get('personalized');
     const { code, result } = res.data;
     if (code === 200) {
-      console.log('result', result)
-      setSongSheetList(result)
+      const sheet: SongSheet[] = result.slice(0, 16)
+      setSongSheetList(sheet)
     }
   }
 
@@ -73,6 +73,13 @@ export default function Home() {
       return <a className={styles.hotTagItem}>{item.name}</a>
     })
   }
+
+  const renderSongSheet = () => {
+    return songSheetList.map(item => {
+      return <SingleSheet sheet={item} ></SingleSheet>
+    })
+  }
+
   return (
     <div className={styles.home}>
       <WyCarousel prev={prev} next={next}>
@@ -103,7 +110,7 @@ export default function Home() {
 
               <div className={styles.down}>
                 <div className={styles.downWrap}>
-
+                  {renderSongSheet()}
                 </div>
               </div>
             </div>
