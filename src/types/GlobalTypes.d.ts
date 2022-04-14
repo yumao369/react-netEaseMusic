@@ -17,4 +17,17 @@ export type SongSheet = {
   playCount: number;
 }
 
+export type Singer = {
+  id: number;
+  name: string;
+  picUrl: string;
+  albumSize: number;
+}
+
+export type SingerParams = {
+  offset: number;
+  limit: number;
+  cat?: string;
+}
+
 export type Callback = () => void

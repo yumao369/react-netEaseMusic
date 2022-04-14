@@ -4,22 +4,31 @@ import { API } from "../../utils/api";
 import styles from "./index.module.less"
 import { Button, Carousel } from "antd";
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { Banner, HotTag, SongSheet } from "../../types/GlobalTypes";
+import { Banner, HotTag, Singer, SingerParams, SongSheet } from "../../types/GlobalTypes";
 import WyCarousel from "./component/wyCarousel";
 import { CarouselRef } from "antd/lib/carousel";
 import SingleSheet from "../../components/wyUi/singleSheet";
+import MemberCard from "./component/memberCard";
 
 export default function Home() {
 
   const [banners, setBanners] = useState<Banner[]>([]);
   const [hotTags, setHotTags] = useState<HotTag[]>([]);
   const [songSheetList, setSongSheetList] = useState<SongSheet[]>([]);
+  const [settledSinger, setSettledSinger] = useState<Singer[]>([]);
   const carouselRef = useRef<CarouselRef | null>(null);
+
+  const defaultSingerParams: SingerParams = {
+    offset: 0,
+    limit: 9,
+    cat: '5001'
+  }
 
   useEffect(() => {
     getBanners();
     getHotTags();
     getPersonalSheetList();
+    getSettledSinger();
   }, [])
 
   const getBanners = async () => {
@@ -45,6 +54,15 @@ export default function Home() {
     if (code === 200) {
       const sheet: SongSheet[] = result.slice(0, 16)
       setSongSheetList(sheet)
+    }
+  }
+
+  const getSettledSinger = async () => {
+    const res = await API.get('artist/list', { params: defaultSingerParams })
+    const { code, artists } = res.data;
+    if (code === 200) {
+      console.log('artists', artists)
+      setSettledSinger(artists)
     }
   }
 
@@ -77,6 +95,22 @@ export default function Home() {
   const renderSongSheet = () => {
     return songSheetList.map(item => {
       return <SingleSheet sheet={item} ></SingleSheet>
+    })
+  }
+
+  const renderSettledSinger = () => {
+    return settledSinger.map(item => {
+      return (
+        <div className={styles.card}>
+          <div className={styles.pic}>
+            <img src={item.picUrl} alt={item.name} />
+          </div>
+          <div className={styles.txt}>
+            <b className={styles.ellipsis}>{item.name}</b>
+            <span className={styles.albumSize}>专辑数：{item.albumSize}</span>
+          </div>
+        </div>
+      )
     })
   }
 
@@ -115,7 +149,15 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className={styles.right}>right</div>
+          <div className={styles.right}>
+            <MemberCard />
+            <div className={styles.settledSinger}>
+              <div className={styles.title}><b className={styles.titTxt}>入驻歌手</b></div>
+              <div className={styles.list}>
+                {renderSettledSinger()}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
