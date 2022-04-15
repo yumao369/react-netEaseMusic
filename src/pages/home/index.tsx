@@ -4,7 +4,7 @@ import { API } from "../../utils/api";
 import styles from "./index.module.less"
 import { Button, Carousel } from "antd";
 import { ArrowRightOutlined } from '@ant-design/icons';
-import { Banner, HotTag, Singer, SingerParams, SongSheet } from "../../types/GlobalTypes";
+import { Banner, HotTag, Singer, SingerParams, Song, SongSheet } from "../../types/GlobalTypes";
 import WyCarousel from "./component/wyCarousel";
 import { CarouselRef } from "antd/lib/carousel";
 import SingleSheet from "../../components/wyUi/singleSheet";
@@ -16,6 +16,8 @@ export default function Home() {
   const [hotTags, setHotTags] = useState<HotTag[]>([]);
   const [songSheetList, setSongSheetList] = useState<SongSheet[]>([]);
   const [settledSinger, setSettledSinger] = useState<Singer[]>([]);
+  const [songSheet, SetSongSheet] = useState<SongSheet>();
+  const [song, setSong] = useState<Song[]>()
   const carouselRef = useRef<CarouselRef | null>(null);
 
   const defaultSingerParams: SingerParams = {
@@ -63,6 +65,15 @@ export default function Home() {
     if (code === 200) {
       console.log('artists', artists)
       setSettledSinger(artists)
+    }
+  }
+
+  const getSongSheetDetail = async (id: number) => {
+    const params = { id: id.toString() }
+    const res = await API.get('playlist/detail', { params })
+    const { code, playlist } = res.data
+    if (code === 200) {
+      SetSongSheet(playlist)
     }
   }
 

@@ -4,6 +4,7 @@ import { Layout, Menu, Input } from "antd"
 import { MobileOutlined, UserAddOutlined } from '@ant-design/icons';
 import Home from './pages/home';
 import styles from "./App.module.less"
+import WyPlayer from './components/wyUi/wyPlayer';
 
 const { Header, Content, Footer } = Layout
 const { SubMenu } = Menu
@@ -61,6 +62,7 @@ function App() {
           </Footer>
         </Layout>
       </div>
+      <WyPlayer />
     </Router>
   );
 }

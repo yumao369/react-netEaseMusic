@@ -47,13 +47,17 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 summary:
 1.Restart the project after adding .env file,or it may not work.
+2.Having services in project.
 
 still need to work:
 1.the styles of header at home page.
 2.the styles of dots of carousel at home page.
+3.resolve
 
 obstacles:
 1.How to deal with the less styles,as the less modules in react has an unique global variable name,but for some styles,I want to use the same classname everywhere.
+2.how to add resole to ensure that the components are loaded after the data is loaded every time, so as to avoid empty components that affect the user experience.
+
 
 solutions:
 1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
