@@ -1,4 +1,5 @@
 import React from "react";
+import { playsheet } from "../../../services/sheet.service";
 import { SongSheet } from "../../../types/GlobalTypes";
 import styles from "./index.module.less";
 
@@ -17,8 +18,13 @@ export default function SingleSheet(props: SingleSheetProps) {
     }
   }
 
+  const playSheet = async (id: number) => {
+    const result = await playsheet(id)
+    console.log('playsheet', result)
+  }
+
   return (
-    <div className={styles.sheetItem}>
+    <div className={styles.sheetItem} onClick={() => { playSheet(props.sheet.id) }} >
       <a className={styles.cover}>
         <img className={styles.img} src={props.sheet.picUrl} alt={props.sheet.name} />
         <div className={styles.bottom}>
