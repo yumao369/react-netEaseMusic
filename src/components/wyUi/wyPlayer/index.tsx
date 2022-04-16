@@ -1,4 +1,5 @@
 import React from "react";
+import WySlider from "../wySlider";
 import styles from "./index.module.less"
 
 export default function WyPlayer() {
@@ -20,7 +21,7 @@ export default function WyPlayer() {
             <i className={styles.mask}></i>
           </div>
           <div className={styles.play}>
-            <div className={[styles.words, styles.clearfix].join(" ")} hidden={true}>
+            <div className={[styles.words, styles.clearfix, styles.hide].join(" ")} hidden={true}>
               <p className={styles.ellipsis}>歌名</p>
               <ul className={[styles.songs, styles.clearfix].join(" ")}>
                 <li className={styles.singer}>
@@ -33,7 +34,7 @@ export default function WyPlayer() {
             </div>
             <div className={styles.bar}>
               <div className={styles.sliderWrap}>
-                <div>进度条</div>
+                <WySlider />
               </div>
               <span className={styles.time}>
                 <em>02:11</em> / 04:35

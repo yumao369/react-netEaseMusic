@@ -45,4 +45,11 @@ export type SongUrl = {
   url: string;
 }
 
+export type WySliderStyle = {
+  width?: string | null;
+  height?: string | null;
+  left?: string | null;
+  bottom?: string | null;
+}
+
 export type Callback = () => void
