@@ -78,6 +78,7 @@ export default function Home() {
   }
 
   const prev = () => {
+    console.log('carouselRef.current', carouselRef, carouselRef.current)
     carouselRef.current?.prev();
   }
 
