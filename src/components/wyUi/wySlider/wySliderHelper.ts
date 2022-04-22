@@ -4,7 +4,7 @@ export function sliderEvent(e: Event) {
 }
 
 
-export function getElementOffset(el: HTMLElement): { top: number; left: number; } {
+export function getElementOffset(el: Element): { top: number; left: number; } {
   if (!el.getClientRects().length) {
     return {
       top: 0,
