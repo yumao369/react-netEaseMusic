@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { fromEvent, merge, Observable, Subscription } from 'rxjs';
 import { filter, tap, pluck, map, distinctUntilChanged, takeUntil } from 'rxjs';
 import styles from "./index.module.less"
@@ -18,22 +18,27 @@ interface WysliderProps {
 
 export default function WySlider(props: WysliderProps = { wyVertical: false, wyMin: 0, wyMax: 100 }) {
 
-  const sliderDom = document.getElementsByClassName(styles.wySlider)[0]
-  const dragStart$: Observable<number>
-  const dragMove$: Observable<number>
-  const dragEnd$: Observable<Event>
+  //const sliderDom = document.getElementsByClassName(styles.wySlider)[0]
+  const sliderRef = useRef<HTMLDivElement>(null)
+  //const dragStart$: Observable<number>
+  //const dragMove$: Observable<number>
+  //const dragEnd$: Observable<Event>
 
-  const dragStart_: Subscription | null;
-  const dragMove_: Subscription | null;
-  const dragEnd_: Subscription | null;
+  //const dragStart_: Subscription | null;
+  //const dragMove_: Subscription | null;
+  //const dragEnd_: Subscription | null;
 
+  /*useEffect(() => {
+    console.log('sliderDom', sliderDom)
+    console.log('sliderRef.current', sliderRef.current, 'sliderRef', sliderRef)
+  })*/
   const createDraggingObservables = () => {
     const orientField = props.wyVertical ? 'pageY' : 'pageX';
     const mouse: SliderEventObserverConfig = {
       start: 'mousedown',
       move: 'mousemove',
       end: 'mouseup',
-      filter: (e: Event) => e instanceof MouseEvent,
+      sourcefilter: (e: Event) => e instanceof MouseEvent,
       pluckKey: [orientField]
     };
 
@@ -41,29 +46,31 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
       start: 'touchstart',
       move: 'touchmove',
       end: 'touchend',
-      filter: (e: Event) => e instanceof TouchEvent,
+      sourcefilter: (e: Event) => e instanceof TouchEvent,
       pluckKey: ['touches', '0', orientField]
     };
 
     [mouse, touch].forEach(source => {
-      const { start, move, end, filter: filterFunc, pluckKey } = source;
-      source.startPlucked$ = fromEvent(sliderDom, start)
-        .pipe(
-          filter(filterFunc),
+      const { start, move, end, sourcefilter, pluckKey } = source;
+      if (null !== sliderRef.current) {
+        source.startPlucked$ = fromEvent(sliderRef.current, start)
+          .pipe(
+            filter(sourcefilter),
+            tap(sliderEvent),
+            pluck(...pluckKey),
+            map((position: number) => findClosestValue(position))
+          );
+
+        source.end$ = fromEvent(sliderRef.current, end);
+        source.moveResolved$ = fromEvent(sliderRef.current, move).pipe(
+          filter(sourcefilter),
           tap(sliderEvent),
           pluck(...pluckKey),
+          distinctUntilChanged(),
           map((position: number) => findClosestValue(position))
-        );
-
-      source.end$ = fromEvent(sliderDom, end);
-      source.moveResolved$ = fromEvent(sliderDom, move).pipe(
-        filter(filterFunc),
-        tap(sliderEvent),
-        pluck(...pluckKey),
-        distinctUntilChanged(),
-        map((position: number) => findClosestValue(position))
         takeUntil(source.end$)
-      )
+        )
+      }
 
     })
     dragStart$ = merge(mouse.startPlucked$, touch.startPlucked$)
@@ -85,17 +92,21 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
     return ratioTrue * (props.wyMax - props.wyMin) + props.wyMin
   }
 
-  const getSliderLength = (): number => {
-    return props.wyVertical ? sliderDom.clientHeight : sliderDom.clientWidth
+  const getSliderLength = (): number | undefined => {
+    return props.wyVertical ? sliderRef.current?.clientHeight : sliderRef.current?.clientWidth
   }
 
-  const getSliderStartPosition = (): number => {
-    const offset = getElementOffset(sliderDom);
-    return props.wyVertical ? offset.top : offset.left
+  const getSliderStartPosition = (): number | undefined => {
+    if (null !== sliderRef.current) {
+      const offset = getElementOffset(sliderRef.current);
+      return props.wyVertical ? offset.top : offset.left
+    }
   }
 
   return (
-    <div className={styles.wySlider}>
+    <div className={styles.wySlider} ref={sliderRef}>
+      <WySliderTrack wyLength={1} wyVertical={false} />
+      <WySliderHandle wyOffset={1} wyVertical={false} />
     </div>
   )
 }

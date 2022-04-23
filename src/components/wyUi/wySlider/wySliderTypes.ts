@@ -11,7 +11,7 @@ export type SliderEventObserverConfig = {
   start: string;
   move: string;
   end: string;
-  filter: (e: Event) => boolean;
+  sourcefilter: (e: Event) => boolean;
   pluckKey: string[];
   startPlucked$?: Observable<number>;
   moveResolved$?: Observable<number>;
