@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { fromEvent, merge, Observable, Subscription } from 'rxjs';
-import { filter, tap, pluck, map, distinctUntilChanged, takeUntil } from 'rxjs';
+import { filter, tap, pluck, map, distinctUntilChanged, takeUntil } from 'rxjs/internal/operators';
 import styles from "./index.module.less"
 import { SliderEventObserverConfig } from "./wySliderTypes";
 import WySliderHandle from "./wySliderHandle";
@@ -18,90 +18,87 @@ interface WysliderProps {
 
 export default function WySlider(props: WysliderProps = { wyVertical: false, wyMin: 0, wyMax: 100 }) {
 
-  //const sliderDom = document.getElementsByClassName(styles.wySlider)[0]
+
   const sliderRef = useRef<HTMLDivElement>(null)
-  //const dragStart$: Observable<number>
-  //const dragMove$: Observable<number>
-  //const dragEnd$: Observable<Event>
+  let refAfterMount: HTMLDivElement
+  let dragStart$: Observable<number>;
+  let dragMove$: Observable<number>;
+  let dragEnd$: Observable<Event>;
 
-  //const dragStart_: Subscription | null;
-  //const dragMove_: Subscription | null;
-  //const dragEnd_: Subscription | null;
+  useEffect(() => {
+    getSliderRef()
+  })
 
-  /*useEffect(() => {
-    console.log('sliderDom', sliderDom)
-    console.log('sliderRef.current', sliderRef.current, 'sliderRef', sliderRef)
-  })*/
+  const getSliderRef = () => {
+    if (sliderRef.current !== null) {
+      refAfterMount = sliderRef.current
+    }
+  }
+
   const createDraggingObservables = () => {
+
     const orientField = props.wyVertical ? 'pageY' : 'pageX';
     const mouse: SliderEventObserverConfig = {
       start: 'mousedown',
       move: 'mousemove',
       end: 'mouseup',
-      sourcefilter: (e: Event) => e instanceof MouseEvent,
+      filter: (e: Event) => e instanceof MouseEvent,
       pluckKey: [orientField]
     };
-
     const touch: SliderEventObserverConfig = {
       start: 'touchstart',
       move: 'touchmove',
       end: 'touchend',
-      sourcefilter: (e: Event) => e instanceof TouchEvent,
+      filter: (e: Event) => e instanceof TouchEvent,
       pluckKey: ['touches', '0', orientField]
     };
 
     [mouse, touch].forEach(source => {
-      const { start, move, end, sourcefilter, pluckKey } = source;
-      if (null !== sliderRef.current) {
-        source.startPlucked$ = fromEvent(sliderRef.current, start)
-          .pipe(
-            filter(sourcefilter),
-            tap(sliderEvent),
-            pluck(...pluckKey),
-            map((position: number) => findClosestValue(position))
-          );
+      const { start, move, end, filter: filterFunc, pluckKey } = source
+      source.startPlucked$ = fromEvent(refAfterMount, start).pipe(
+        filter(filterFunc),
+        tap(sliderEvent),
+        pluck(...pluckKey),
+        map((position: unknown) => findClosestValue(position as number))
+      )
 
-        source.end$ = fromEvent(sliderRef.current, end);
-        source.moveResolved$ = fromEvent(sliderRef.current, move).pipe(
-          filter(sourcefilter),
-          tap(sliderEvent),
-          pluck(...pluckKey),
-          distinctUntilChanged(),
-          map((position: number) => findClosestValue(position))
+      source.end$ = fromEvent(refAfterMount, end)
+      source.moveResolved$ = fromEvent(refAfterMount, move).pipe(
+        filter(filterFunc),
+        tap(sliderEvent),
+        pluck(...pluckKey),
+        distinctUntilChanged(),
+        map((position: unknown) => findClosestValue(position as number)),
         takeUntil(source.end$)
-        )
-      }
-
+      )
     })
-    dragStart$ = merge(mouse.startPlucked$, touch.startPlucked$)
-    dragMove$ = merge(mouse.moveResolved$, touch.moveResolved$);
-    dragEnd$ = merge(mouse.end$, touch.end$);
-  }
 
-  const subscribeDrag(events: string[] = ['start', 'move', 'end']){
-    if (inArray(events, 'start') && dragStart$ && !dragStart_) {
-      dragStart_ = dragStart$.subscribe()
-    }
   }
 
   const findClosestValue = (position: number): number => {
+    // 获取滑块总长
     const sliderLength = getSliderLength();
+
+    // 滑块(左, 上)端点位置
     const sliderStart = getSliderStartPosition();
+
+    // 滑块当前位置 / 滑块总长
     const ratio = limitNumberInRange((position - sliderStart) / sliderLength, 0, 1);
     const ratioTrue = props.wyVertical ? 1 - ratio : ratio;
-    return ratioTrue * (props.wyMax - props.wyMin) + props.wyMin
+    return ratioTrue * (props.wyMax - props.wyMin) + props.wyMin;
   }
 
-  const getSliderLength = (): number | undefined => {
-    return props.wyVertical ? sliderRef.current?.clientHeight : sliderRef.current?.clientWidth
+
+  const getSliderLength = (): number => {
+    return props.wyVertical ? refAfterMount.clientHeight : refAfterMount.clientWidth;
   }
 
-  const getSliderStartPosition = (): number | undefined => {
-    if (null !== sliderRef.current) {
-      const offset = getElementOffset(sliderRef.current);
-      return props.wyVertical ? offset.top : offset.left
-    }
+  const getSliderStartPosition = (): number => {
+    const offset = getElementOffset(refAfterMount);
+    return props.wyVertical ? offset.top : offset.left;
   }
+
+
 
   return (
     <div className={styles.wySlider} ref={sliderRef}>
