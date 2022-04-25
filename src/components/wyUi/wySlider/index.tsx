@@ -20,9 +20,9 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
   //const sliderDom = document.getElementsByClassName(styles.wySlider)[0]
   const sliderRef = useRef<HTMLDivElement>(null)
-  //const dragStart$: Observable<number>
-  //const dragMove$: Observable<number>
-  //const dragEnd$: Observable<Event>
+  let dragStart$: Observable<number>
+  let dragMove$: Observable<number>
+  let dragEnd$: Observable<Event>
 
   //const dragStart_: Subscription | null;
   //const dragMove_: Subscription | null;
@@ -52,13 +52,13 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
     [mouse, touch].forEach(source => {
       const { start, move, end, sourcefilter, pluckKey } = source;
-      if (null !== sliderRef.current) {
+      if (sliderRef.current !== null) {
         source.startPlucked$ = fromEvent(sliderRef.current, start)
           .pipe(
             filter(sourcefilter),
             tap(sliderEvent),
             pluck(...pluckKey),
-            map((position: number) => findClosestValue(position))
+            map((position) => findClosestValue(sliderRef.current, position))
           );
 
         source.end$ = fromEvent(sliderRef.current, end);
@@ -67,11 +67,10 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
           tap(sliderEvent),
           pluck(...pluckKey),
           distinctUntilChanged(),
-          map((position: number) => findClosestValue(position))
-        takeUntil(source.end$)
+          map((position) => findClosestValue(sliderRef.current, position)),
+          takeUntil(source.end$)
         )
       }
-
     })
     dragStart$ = merge(mouse.startPlucked$, touch.startPlucked$)
     dragMove$ = merge(mouse.moveResolved$, touch.moveResolved$);
@@ -84,15 +83,15 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
     }
   }
 
-  const findClosestValue = (position: number): number => {
-    const sliderLength = getSliderLength();
-    const sliderStart = getSliderStartPosition();
+  const findClosestValue = (ref: HTMLDivElement, position: number): number => {
+    const sliderLength = getSliderLength(ref);
+    const sliderStart = getSliderStartPosition(ref);
     const ratio = limitNumberInRange((position - sliderStart) / sliderLength, 0, 1);
     const ratioTrue = props.wyVertical ? 1 - ratio : ratio;
     return ratioTrue * (props.wyMax - props.wyMin) + props.wyMin
   }
 
-  const getSliderLength = (): number | undefined => {
+  /*const getSliderLength = (): number | undefined => {
     return props.wyVertical ? sliderRef.current?.clientHeight : sliderRef.current?.clientWidth
   }
 
@@ -101,7 +100,17 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
       const offset = getElementOffset(sliderRef.current);
       return props.wyVertical ? offset.top : offset.left
     }
+  }*/
+
+  const getSliderLength = (ref: HTMLDivElement): number => {
+    return props.wyVertical ? ref.clientHeight : ref.clientWidth
   }
+
+  const getSliderStartPosition = (ref: HTMLDivElement): number => {
+    const offset = getElementOffset(ref);
+    return props.wyVertical ? offset.top : offset.left
+  }
+
 
   return (
     <div className={styles.wySlider} ref={sliderRef}>
