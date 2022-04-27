@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { fromEvent, merge, Observable, Subscription } from 'rxjs';
+import { fromEvent, merge, observable, Observable, Subscriber, Subscription } from 'rxjs';
 import { filter, tap, pluck, map, distinctUntilChanged, takeUntil } from 'rxjs/internal/operators';
 import styles from "./index.module.less"
 import { SliderEventObserverConfig } from "./wySliderTypes";
@@ -24,6 +24,10 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
   let dragStart$: Observable<number>;
   let dragMove$: Observable<number>;
   let dragEnd$: Observable<Event>;
+  let dragStart_: Subscription | null;
+  let dragMove_: Subscription | null;
+  let dragEnd_: Subscription | null;
+  let isDragging = false;
 
   useEffect(() => {
     getSliderRef()
@@ -43,14 +47,20 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
       move: 'mousemove',
       end: 'mouseup',
       filter: (e: Event) => e instanceof MouseEvent,
-      pluckKey: [orientField]
+      pluckKey: [orientField],
+      startPlucked$: new Observable(),
+      moveResolved$: new Observable(),
+      end$: new Observable()
     };
     const touch: SliderEventObserverConfig = {
       start: 'touchstart',
       move: 'touchmove',
       end: 'touchend',
       filter: (e: Event) => e instanceof TouchEvent,
-      pluckKey: ['touches', '0', orientField]
+      pluckKey: ['touches', '0', orientField],
+      startPlucked$: new Observable(),
+      moveResolved$: new Observable(),
+      end$: new Observable()
     };
 
     [mouse, touch].forEach(source => {
@@ -72,6 +82,18 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
         takeUntil(source.end$)
       )
     })
+    dragStart$ = merge(mouse.startPlucked$, touch.startPlucked$)
+    dragMove$ = merge(mouse.moveResolved$, touch.moveResolved$)
+    dragEnd$ = merge(mouse.end$, touch.end$)
+  }
+
+  const subscribeDrag = (events: string[] = ['start', 'move', 'end']) => {
+    if (inArray(events, 'start') && dragStart$ && !dragStart_) {
+      dragStart_ = dragStart$.subscribe()
+    }
+  }
+
+  const toggleDragMoving = (movable: boolean) => {
 
   }
 
@@ -97,6 +119,8 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
     const offset = getElementOffset(refAfterMount);
     return props.wyVertical ? offset.top : offset.left;
   }
+
+
 
 
 

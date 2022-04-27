@@ -15,9 +15,9 @@ export type SliderEventObserverConfig = {
   //filterTouchEvent?: (e: TouchEvent) => boolean;
   filter: (e: Event) => boolean;
   pluckKey: string[];
-  startPlucked$?: Observable<number>;
-  moveResolved$?: Observable<number>;
-  end$?: Observable<Event>;
+  startPlucked$: Observable<number>;
+  moveResolved$: Observable<number>;
+  end$: Observable<Event>;
 }
 
 export type SliderValue = number | null;
