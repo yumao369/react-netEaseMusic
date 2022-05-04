@@ -4,5 +4,6 @@ export function limitNumberInRange(val: number, min: number, max: number): numbe
 
 
 export function getPercent(min: number, max: number, val: number): number {
+  console.log('min', min, 'max', max, 'val', val)
   return ((val - min) / (max - min)) * 100;
 }

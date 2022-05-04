@@ -34,7 +34,7 @@ export default function WyPlayer() {
             </div>
             <div className={styles.bar}>
               <div className={styles.sliderWrap}>
-                <WySlider wyMax={1} wyMin={1} wyVertical={false} />
+                <WySlider wyMax={100} wyMin={0} wyVertical={false} />
               </div>
               <span className={styles.time}>
                 <em>02:11</em> / 04:35

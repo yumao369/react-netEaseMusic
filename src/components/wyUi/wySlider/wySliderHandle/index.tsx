@@ -17,10 +17,10 @@ export default function WySliderHandle(props: WySliderHandleProps) {
 
   const styleChange = () => {
     const changeProperty = props.wyVertical ? 'bottom' : 'left'
-    //setStyle({changeProperty:props.wyOffset+'%'})
+    setStyle({ left: props.wyOffset + '%' })
   }
 
   return (
-    <div className={styles.wySliderHandle}></div>
+    <div className={styles.wySliderHandle} style={style}></div>
   )
 }

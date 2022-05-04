@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { fromEvent, merge, observable, Observable, Subscriber, Subscription } from 'rxjs';
 import { filter, tap, pluck, map, distinctUntilChanged, takeUntil } from 'rxjs/internal/operators';
 import styles from "./index.module.less"
@@ -7,7 +7,7 @@ import WySliderHandle from "./wySliderHandle";
 import WySliderTrack from "./wySliderTrack";
 import ReactDOM from "react-dom";
 import { getElementOffset, sliderEvent } from "./wySliderHelper";
-import { limitNumberInRange } from "../../../utils/number";
+import { getPercent, limitNumberInRange } from "../../../utils/number";
 import { inArray } from "../../../utils/array";
 
 interface WysliderProps {
@@ -20,6 +20,9 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
 
   const sliderRef = useRef<HTMLDivElement>(null)
+  const [value, setValue] = useState<number>(0)
+  const [offset, setOffset] = useState<number>(0)
+  const [isDragging, setIsDragging] = useState<boolean>(false)
   let refAfterMount: HTMLDivElement
   let dragStart$: Observable<number>;
   let dragMove$: Observable<number>;
@@ -27,10 +30,12 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
   let dragStart_: Subscription | null;
   let dragMove_: Subscription | null;
   let dragEnd_: Subscription | null;
-  let isDragging = false;
 
   useEffect(() => {
     getSliderRef()
+    createDraggingObservables()
+    subscribeDrag(['start'])
+    console.log('offset', offset)
   })
 
   const getSliderRef = () => {
@@ -68,6 +73,7 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
       source.startPlucked$ = fromEvent(refAfterMount, start).pipe(
         filter(filterFunc),
         tap(sliderEvent),
+        tap(x => console.log('xxx', x)),
         pluck(...pluckKey),
         map((position: unknown) => findClosestValue(position as number))
       )
@@ -89,12 +95,67 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
   const subscribeDrag = (events: string[] = ['start', 'move', 'end']) => {
     if (inArray(events, 'start') && dragStart$ && !dragStart_) {
-      dragStart_ = dragStart$.subscribe()
+      dragStart_ = dragStart$.subscribe(position => onDragStart(position))
+      //dragStart_ = dragStart$.subscribe(position => console.log('position', position))
+    }
+    if (inArray(events, 'move') && dragMove$ && !dragMove_) {
+      dragMove_ = dragMove$.subscribe(position => onDragMove(position))
+    }
+    if (inArray(events, 'end') && dragEnd$ && !dragEnd_) {
+      dragEnd_ = dragEnd$.subscribe(onDragEnd)
     }
   }
 
-  const toggleDragMoving = (movable: boolean) => {
+  const unsubscribeDrag = (events: string[] = ['start', 'move', 'end']) => {
+    if (inArray(events, 'start') && dragStart_) {
+      dragStart_.unsubscribe()
+      dragStart_ = null
+    }
+    if (inArray(events, 'move') && dragMove_) {
+      dragMove_.unsubscribe()
+      dragMove_ = null
+    }
+    if (inArray(events, 'end') && dragEnd_) {
+      dragEnd_.unsubscribe()
+      dragEnd_ = null
+    }
+  }
 
+  const onDragStart = (value: number) => {
+    toggleDragMoving(true)
+    setValue(value)
+    updateTrackAndHandles()
+  }
+
+  const onDragMove = (value: number) => {
+    if (isDragging) {
+      setValue(value)
+      updateTrackAndHandles()
+    }
+  }
+
+  const onDragEnd = () => {
+    toggleDragMoving(false)
+  }
+
+  const updateTrackAndHandles = () => {
+    setOffset(getValueToOffset())
+  }
+
+  const getValueToOffset = (): number => {
+    console.log('value', value, 'max', props.wyMax)
+    const data = getPercent(props.wyMin, props.wyMax, value)
+    console.log('data', data)
+    return data
+  }
+
+  const toggleDragMoving = (movable: boolean) => {
+    setIsDragging(true)
+    if (movable) {
+      subscribeDrag(['move', 'end'])
+    } else {
+      unsubscribeDrag(['move', 'end'])
+    }
   }
 
   const findClosestValue = (position: number): number => {
@@ -126,8 +187,8 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
   return (
     <div className={styles.wySlider} ref={sliderRef}>
-      <WySliderTrack wyLength={1} wyVertical={false} />
-      <WySliderHandle wyOffset={1} wyVertical={false} />
+      <WySliderTrack wyLength={offset} wyVertical={false} />
+      <WySliderHandle wyOffset={offset} wyVertical={false} />
     </div>
   )
 }
