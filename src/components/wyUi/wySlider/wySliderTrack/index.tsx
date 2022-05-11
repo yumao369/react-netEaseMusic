@@ -8,16 +8,21 @@ interface WySliderTrackProps {
   wyBuffer?: boolean;
 }
 
-export default function WySliderTrack(props: WySliderTrackProps = { wyVertical: false, wyLength: 0, wyBuffer: false }) {
+export default function WySliderTrack(props: WySliderTrackProps) {
 
+  const { wyLength } = props
+
+  useEffect(() => {
+    console.log('wylength', wyLength)
+  })
 
   return (
     <>
       {
         props.wyVertical ? (
-          <div className={[styles.wySliderTrackVertical, props.wyBuffer ? styles.buffer : ''].join(' ')} style={{ width: `${props.wyLength}%` }}></div>
+          <div className={[styles.wySliderTrackVertical, props.wyBuffer ? styles.buffer : ''].join(' ')} style={{ height: `${wyLength}%` }}></div>
         ) : (
-          <div className={styles.wySliderTrack} style={{ width: `${props.wyLength}%` }}></div>
+          <div className={[styles.wySliderTrack, props.wyBuffer ? styles.buffer : ''].join(' ')} style={{ width: `${wyLength}%` }}></div>
         )
       }
     </>

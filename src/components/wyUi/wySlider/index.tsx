@@ -14,16 +14,19 @@ interface WysliderProps {
   wyVertical?: boolean;
   wyMin?: number;
   wyMax?: number;
-  bufferOffset?: SliderValue;
+  bufferOffset?: number;
 }
 
-export default function WySlider(props: WysliderProps = { wyVertical: false, wyMin: 0, wyMax: 100, bufferOffset: 0 }) {
+export default function WySlider(props: WysliderProps) {
+
+  const { wyVertical = false, wyMin = 0, wyMax = 100, bufferOffset = 0 } = props
 
   const sliderRef = useRef<HTMLDivElement>(null)
   const [offset, setOffset] = useState(0)
   const doc = document
 
   useEffect(() => {
+    console.log('props.buffer', bufferOffset)
     const mouseDown$ = fromEvent(sliderRef.current, 'mousedown')
     const mouseMove$ = fromEvent(doc, 'mousemove');
     const mouseUp$ = fromEvent(doc, 'mouseup');
@@ -32,14 +35,14 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
         tap((x: MouseEvent) => console.log(x.type)),
         tap(sliderEvent),
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
-        map((event: MouseEvent) => event.clientX),
+        map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
         tap(position => setOffset(findClosestValue(position))),
         exhaustMap((start) =>
           mouseMove$.pipe(
             tap((x: MouseEvent) => console.log(x.type)),
             tap(sliderEvent),
             //tap(event => { setX(event.clientX); setY(event.clientY) }),
-            map((event: MouseEvent) => event.clientX),
+            map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
             tap(position => setOffset(findClosestValue(position))),
             takeUntil(mouseUp$)
           )
@@ -55,17 +58,17 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
     const sliderStart = getSliderStartPosition();
 
     const ratio = limitNumberInRange((position - sliderStart) / sliderLength, 0, 1);
-    const ratioTrue = ratio;
+    const ratioTrue = wyVertical ? 1 - ratio : ratio;
     return ratioTrue * (100 - 0) + 0;
   }
 
   const getSliderLength = () => {
-    return sliderRef.current.clientWidth
+    return wyVertical ? sliderRef.current.clientHeight : sliderRef.current.clientWidth
   }
 
   const getSliderStartPosition = () => {
     const offset = getElementOffset(sliderRef.current);
-    return offset.left;
+    return wyVertical ? offset.top : offset.left;
   }
 
   const getElementOffset = (el: HTMLElement) => {
@@ -97,10 +100,10 @@ export default function WySlider(props: WysliderProps = { wyVertical: false, wyM
 
 
   return (
-    <div className={styles.wySlider} ref={sliderRef}>
-      <WySliderTrack wyLength={props.bufferOffset} wyVertical={false} wyBuffer={true} />
-      <WySliderTrack wyLength={offset} wyVertical={false} />
-      <WySliderHandle wyOffset={offset} wyVertical={false} />
+    <div className={[styles.wySlider, wyVertical ? styles.wySliderVertical : ''].join(' ')} ref={sliderRef}>
+      <WySliderTrack wyLength={bufferOffset} wyVertical={wyVertical} wyBuffer={true} />
+      <WySliderTrack wyLength={offset} wyVertical={wyVertical} />
+      <WySliderHandle wyOffset={offset} wyVertical={wyVertical} />
     </div>
   )
 }
