@@ -10,7 +10,7 @@ export default function WyPlayer() {
       </div>
       <div className={styles.hand}></div>
       <div className={styles.container}>
-        <div className={styles.wrap}>
+        <div className={[styles.wrap, 'wrap'].join(" ")}>
           <div className={styles.btns}>
             <i className={[styles.prev, styles.btnsCommon].join(' ')}></i>
             <i className={[styles.toggle, styles.btnsCommon].join(' ')}></i>
@@ -21,7 +21,7 @@ export default function WyPlayer() {
             <i className={styles.mask}></i>
           </div>
           <div className={styles.play}>
-            <div className={[styles.words, styles.clearfix, styles.hide].join(" ")} hidden={true}>
+            <div className={[styles.words, styles.clearfix, styles.hide].join(" ")} >
               <p className={styles.ellipsis}>歌名</p>
               <ul className={[styles.songs, styles.clearfix].join(" ")}>
                 <li className={styles.singer}>
@@ -48,7 +48,7 @@ export default function WyPlayer() {
           </div>
           <div className={styles.ctrl}>
             <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量"></i>
-            <i className={[styles.loop, , styles.ctrlCommon].join(' ')} title="循环"></i>
+            <i className={[styles.loop, styles.ctrlCommon].join(' ')} title="循环"></i>
             <p className={styles.open}>
               <span className={styles.openSpan}></span>
             </p>

@@ -2,31 +2,24 @@ import React, { useEffect, useState } from "react";
 import styles from "./index.module.less"
 import { WySliderStyle } from "../wySliderTypes";
 
-interface WySliderHandleProps {
+interface WySliderTrackProps {
   wyVertical: boolean;
   wyLength: number;
+  wyBuffer?: boolean;
 }
 
-export default function WySliderTrack(props: WySliderHandleProps) {
+export default function WySliderTrack(props: WySliderTrackProps = { wyVertical: false, wyLength: 0, wyBuffer: false }) {
 
-  const [style, setStyle] = useState<WySliderStyle>({})
 
-  useEffect(() => {
-    styleChange()
-  }, [])
-
-  const styleChange = () => {
-    if (props.wyVertical) {
-      setStyle({
-        height: props.wyLength + '%'
-      })
-    } else {
-      setStyle({
-        width: props.wyLength + '%'
-      })
-    }
-  }
   return (
-    <div className={styles.wySliderTrack} style={style}></div>
+    <>
+      {
+        props.wyVertical ? (
+          <div className={[styles.wySliderTrackVertical, props.wyBuffer ? styles.buffer : ''].join(' ')} style={{ width: `${props.wyLength}%` }}></div>
+        ) : (
+          <div className={styles.wySliderTrack} style={{ width: `${props.wyLength}%` }}></div>
+        )
+      }
+    </>
   )
 }

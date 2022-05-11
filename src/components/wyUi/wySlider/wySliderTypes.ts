@@ -12,7 +12,7 @@ export type SliderEventObserverConfig = {
   move: string;
   end: string;
   //filterMouseEvent?: (e: MouseEvent) => boolean;
-  //filterTouchEvent?: (e: TouchEvent) => boolean;
+  filterTouchEvent?: (e: TouchEvent) => boolean;
   filter: (e: Event) => boolean;
   pluckKey: string[];
   startPlucked$: Observable<number>;

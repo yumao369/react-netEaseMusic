@@ -9,18 +9,16 @@ interface WySliderHandleProps {
 
 export default function WySliderHandle(props: WySliderHandleProps) {
 
-  const [style, setStyle] = useState<WySliderStyle>({})
-
-  useEffect(() => {
-    styleChange()
-  }, [])
-
-  const styleChange = () => {
-    const changeProperty = props.wyVertical ? 'bottom' : 'left'
-    setStyle({ left: props.wyOffset + '%' })
-  }
-
   return (
-    <div className={styles.wySliderHandle} style={style}></div>
+
+    <>
+      {
+        props.wyVertical ? (
+          <div className={styles.wySliderHandleVertical} style={{ bottom: `${props.wyOffset}%` }}></div>
+        ) : (
+          <div className={styles.wySliderHandle} style={{ left: `${props.wyOffset}%` }}></div>
+        )
+      }
+    </>
   )
 }
