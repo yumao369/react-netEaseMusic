@@ -12,10 +12,6 @@ export default function WySliderTrack(props: WySliderTrackProps) {
 
   const { wyLength } = props
 
-  useEffect(() => {
-    console.log('wylength', wyLength)
-  })
-
   return (
     <>
       {

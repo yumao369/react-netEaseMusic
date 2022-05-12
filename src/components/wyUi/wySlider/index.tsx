@@ -25,53 +25,66 @@ export default function WySlider(props: WysliderProps) {
   const [offset, setOffset] = useState(0)
   const doc = document
 
+  /**
+   * subscribe mousedown and setstate,after that aubscribe mousemove and setstate if mouse moves until mouse up.
+   * 
+   */
   useEffect(() => {
     console.log('props.buffer', bufferOffset)
+    //@ts-ignore
     const mouseDown$ = fromEvent(sliderRef.current, 'mousedown')
     const mouseMove$ = fromEvent(doc, 'mousemove');
     const mouseUp$ = fromEvent(doc, 'mouseup');
     const subscription = mouseDown$
       .pipe(
+        //@ts-ignore
         tap((x: MouseEvent) => console.log(x.type)),
         tap(sliderEvent),
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
-        map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
+        //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
+        map((event: MouseEvent) => wyVertical ? event.pageY : event.pageX),
         tap(position => setOffset(findClosestValue(position))),
-        exhaustMap((start) =>
+        exhaustMap(() =>
           mouseMove$.pipe(
+            //@ts-ignore
             tap((x: MouseEvent) => console.log(x.type)),
             tap(sliderEvent),
             //tap(event => { setX(event.clientX); setY(event.clientY) }),
-            map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
+            //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
+            map((event: MouseEvent) => wyVertical ? event.pageY : event.pageX),
             tap(position => setOffset(findClosestValue(position))),
             takeUntil(mouseUp$)
           )
         )
       )
       .subscribe();
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
 
   const findClosestValue = (position: number) => {
     const sliderLength = getSliderLength();
-
     const sliderStart = getSliderStartPosition();
-
     const ratio = limitNumberInRange((position - sliderStart) / sliderLength, 0, 1);
     const ratioTrue = wyVertical ? 1 - ratio : ratio;
-    return ratioTrue * (100 - 0) + 0;
+    return ratioTrue * (wyMax - wyMin) + wyMin;
   }
 
   const getSliderLength = () => {
+    //@ts-ignore
     return wyVertical ? sliderRef.current.clientHeight : sliderRef.current.clientWidth
   }
 
   const getSliderStartPosition = () => {
+    //@ts-ignore
     const offset = getElementOffset(sliderRef.current);
     return wyVertical ? offset.top : offset.left;
   }
 
   const getElementOffset = (el: HTMLElement) => {
+    console.log('el', el)
     if (!el.getClientRects().length) {
       return {
         top: 0,
@@ -79,11 +92,14 @@ export default function WySlider(props: WysliderProps) {
       }
     }
 
+    //获得元素相对于视窗的位置
     const rect = el.getBoundingClientRect();
+    //pageXOffset 和 pageYOffset 属性返回文档在窗口左上角水平和垂直方向滚动的像素。
     const win = el.ownerDocument.defaultView;
-
     return {
+      //@ts-ignore
       top: rect.top + win.pageYOffset,
+      //@ts-ignore
       left: rect.left + win.pageXOffset
     }
   }

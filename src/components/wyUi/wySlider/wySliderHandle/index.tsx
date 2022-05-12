@@ -9,14 +9,16 @@ interface WySliderHandleProps {
 
 export default function WySliderHandle(props: WySliderHandleProps) {
 
+  const { wyOffset } = props
+
   return (
 
     <>
       {
         props.wyVertical ? (
-          <div className={styles.wySliderHandleVertical} style={{ bottom: `${props.wyOffset}%` }}></div>
+          <div className={styles.wySliderHandleVertical} style={{ bottom: `${wyOffset}%` }}></div>
         ) : (
-          <div className={styles.wySliderHandle} style={{ left: `${props.wyOffset}%` }}></div>
+          <div className={styles.wySliderHandle} style={{ left: `${wyOffset}%` }}></div>
         )
       }
     </>
