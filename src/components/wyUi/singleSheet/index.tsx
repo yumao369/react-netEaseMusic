@@ -6,6 +6,7 @@ import styles from "./index.module.less";
 
 interface SingleSheetProps {
   sheet: SongSheet;
+  onPlay: (id: number) => void;
 }
 
 export default function SingleSheet(props: SingleSheetProps) {
@@ -19,12 +20,13 @@ export default function SingleSheet(props: SingleSheetProps) {
   }
 
   const playSheet = async (id: number) => {
-    const result = await playsheet(id)
-    console.log('playsheet', result)
+    props.onPlay(id)
   }
 
+
+
   return (
-    <div className={styles.sheetItem} onClick={() => { playSheet(props.sheet.id) }} >
+    <div className={styles.sheetItem}  >
       <a className={styles.cover}>
         <img className={styles.img} src={props.sheet.picUrl} alt={props.sheet.name} />
         <div className={styles.bottom}>
@@ -32,7 +34,7 @@ export default function SingleSheet(props: SingleSheetProps) {
             <i className={[styles.icon, styles.erji].join(' ')}></i>
             <span className={styles.playCount}>{playCountFormatter(props.sheet.playCount)}</span>
           </div>
-          <i className={[styles.icon, styles.play].join(" ")}></i>
+          <i className={[styles.icon, styles.play].join(" ")} onClick={() => { playSheet(props.sheet.id) }}></i>
         </div>
       </a>
       <span className={styles.dec}>{props.sheet.name}</span>

@@ -9,6 +9,8 @@ import WyCarousel from "./component/wyCarousel";
 import { CarouselRef } from "antd/lib/carousel";
 import SingleSheet from "../../components/wyUi/singleSheet";
 import MemberCard from "./component/memberCard";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setSongList } from "../../redux/playerSlice";
 
 export default function Home() {
 
@@ -19,6 +21,11 @@ export default function Home() {
   const [songSheet, SetSongSheet] = useState<SongSheet>();
   const [song, setSong] = useState<Song[]>()
   const carouselRef = useRef<CarouselRef | null>(null);
+
+  const playList = useAppSelector((state) => state.playReducer.playList)
+  const songList = useAppSelector((state) => state.playReducer.songList)
+  const currentIndex = useAppSelector((state) => state.playReducer.currentIndex)
+  const dispatch = useAppDispatch()
 
   const defaultSingerParams: SingerParams = {
     offset: 0,
@@ -79,11 +86,17 @@ export default function Home() {
 
   const prev = () => {
     console.log('carouselRef.current', carouselRef, carouselRef.current)
-    carouselRef.current?.prev();
+    //@ts-ignore
+    carouselRef.current.prev();
   }
 
   const next = () => {
-    carouselRef.current?.next();
+    //@ts-ignore
+    carouselRef.current.next();
+  }
+
+  const onPlaySheet = (id: number) => {
+    console.log('id', id)
   }
 
   const renderCarouselItem = () => {
@@ -106,7 +119,7 @@ export default function Home() {
 
   const renderSongSheet = () => {
     return songSheetList.map(item => {
-      return <SingleSheet sheet={item} ></SingleSheet>
+      return <SingleSheet sheet={item} onPlay={onPlaySheet}></SingleSheet>
     })
   }
 

@@ -53,3 +53,15 @@ export type WySliderStyle = {
 }
 
 export type Callback = () => void
+
+//redux
+export type Action = {
+  type: string;
+  data: any;
+}
+
+//wy-player types
+export type PlayMode = {
+  type: 'loop' | 'random' | 'singleLoop',
+  label: '循环' | '随机' | '单曲循环'
+}
