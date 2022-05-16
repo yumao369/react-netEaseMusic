@@ -43,9 +43,9 @@ function App() {
                 <div className={styles.member}>
                   <div className={styles.noLogin}>
                     <Menu mode='horizontal' theme='dark'>
-                      <SubMenu title='登陆' >
-                        <Menu.Item icon={<MobileOutlined />}>手机登陆</Menu.Item>
-                        <Menu.Item icon={<UserAddOutlined />}>注册</Menu.Item>
+                      <SubMenu title='登陆' key={'login'}>
+                        <Menu.Item icon={<MobileOutlined />} key={'sign up'}>手机登陆</Menu.Item>
+                        <Menu.Item icon={<UserAddOutlined />} key={'sign in'}>注册</Menu.Item>
                       </SubMenu>
                     </Menu>
                   </div>

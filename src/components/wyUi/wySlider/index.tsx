@@ -30,7 +30,6 @@ export default function WySlider(props: WysliderProps) {
    * 
    */
   useEffect(() => {
-    console.log('props.buffer', bufferOffset)
     //@ts-ignore
     const mouseDown$ = fromEvent(sliderRef.current, 'mousedown')
     const mouseMove$ = fromEvent(doc, 'mousemove');
@@ -38,7 +37,6 @@ export default function WySlider(props: WysliderProps) {
     const subscription = mouseDown$
       .pipe(
         //@ts-ignore
-        tap((x: MouseEvent) => console.log(x.type)),
         tap(sliderEvent),
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
         //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
@@ -47,7 +45,6 @@ export default function WySlider(props: WysliderProps) {
         exhaustMap(() =>
           mouseMove$.pipe(
             //@ts-ignore
-            tap((x: MouseEvent) => console.log(x.type)),
             tap(sliderEvent),
             //tap(event => { setX(event.clientX); setY(event.clientY) }),
             //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
@@ -84,7 +81,6 @@ export default function WySlider(props: WysliderProps) {
   }
 
   const getElementOffset = (el: HTMLElement) => {
-    console.log('el', el)
     if (!el.getClientRects().length) {
       return {
         top: 0,

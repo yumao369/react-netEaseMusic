@@ -13,6 +13,5 @@ export const playsheet = async (id: number): Promise<Song[]> => {
   const songSheetDetail = await getSongSheetDetail(id)
   const tracks = songSheetDetail.tracks
   const playsheet = getSongList(tracks)
-  console.log('playsheet', playsheet)
   return playsheet
 }
