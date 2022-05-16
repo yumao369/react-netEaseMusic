@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../../redux/hooks";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
@@ -6,7 +6,7 @@ import styles from "./index.module.less"
 export default function WyPlayer() {
 
   const audioRef = useRef<HTMLAudioElement>(null)
-
+  const [currentTime, setCurrentTime] = useState(0)
   const playList = useAppSelector((state) => state.playReducer.playList)
   const songList = useAppSelector((state) => state.playReducer.songList)
   const currentIndex = useAppSelector((state) => state.playReducer.currentIndex)
@@ -18,7 +18,19 @@ export default function WyPlayer() {
     audioRef.current.play()
   }
 
+  const onTimeupdate = (e: Event) => {
+    console.log('e', e)
+    //@ts-ignore
+    setCurrentTime(e.target.currentTime)
+  }
 
+  useEffect(() => {
+    console.log('currenttime', currentTime)
+  })
+
+  useEffect(() => {
+    console.log('rerender')
+  })
 
 
   return (
@@ -77,7 +89,13 @@ export default function WyPlayer() {
           </div>
         </div>
       </div>
-      <audio ref={audioRef} src={currentSong.url} onCanPlay={onCanplay}></audio>
+
+      <audio
+        ref={audioRef}
+        src={currentSong.url}
+        onCanPlay={onCanplay}
+        //@ts-ignore
+        onTimeUpdate={onTimeupdate}></audio>
     </div>
   )
 }
