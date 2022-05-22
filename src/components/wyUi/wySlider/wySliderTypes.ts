@@ -1,11 +1,11 @@
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
 
 export type WySliderStyle = {
   width?: string;
   height?: string;
   left?: string;
   bottom?: string;
-}
+};
 
 export type SliderEventObserverConfig = {
   start: string;
@@ -18,6 +18,6 @@ export type SliderEventObserverConfig = {
   startPlucked$: Observable<number>;
   moveResolved$: Observable<number>;
   end$: Observable<Event>;
-}
+};
 
 export type SliderValue = number | null;

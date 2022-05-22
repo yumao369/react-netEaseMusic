@@ -3,13 +3,12 @@ export function sliderEvent(e: Event) {
   e.preventDefault();
 }
 
-
-export function getElementOffset(el: Element): { top: number; left: number; } {
+export function getElementOffset(el: Element): { top: number; left: number } {
   if (!el.getClientRects().length) {
     return {
       top: 0,
-      left: 0
-    }
+      left: 0,
+    };
   }
 
   const rect = el.getBoundingClientRect();
@@ -18,13 +17,12 @@ export function getElementOffset(el: Element): { top: number; left: number; } {
   if (win !== null) {
     return {
       top: rect.top + win.pageYOffset,
-      left: rect.left + win.pageXOffset
-    }
+      left: rect.left + win.pageXOffset,
+    };
   } else {
     return {
       top: 0,
-      left: 0
-    }
+      left: 0,
+    };
   }
 }
-
