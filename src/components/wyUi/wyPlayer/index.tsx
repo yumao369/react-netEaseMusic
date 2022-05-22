@@ -1,8 +1,40 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useAppSelector } from "../../../redux/hooks";
 import WySlider from "../wySlider";
 import styles from "./index.module.less";
 
 export default function WyPlayer() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const playList = useAppSelector((state) => state.playReducer.playList);
+  const songList = useAppSelector((state) => state.playReducer.songList);
+  const currentIndex = useAppSelector(
+    (state) => state.playReducer.currentIndex
+  );
+  const currentSong = playList[currentIndex];
+  const picUrl = currentSong
+    ? currentSong.al.picUrl
+    : "//s4.music.126.net/style/web2/img/default/default_album.jpg";
+
+  const onCanplay = () => {
+    //@ts-ignore
+    audioRef.current.play();
+  };
+
+  const onTimeupdate = (e: Event) => {
+    console.log("e", e);
+    //@ts-ignore
+    setCurrentTime(e.target.currentTime);
+  };
+
+  useEffect(() => {
+    console.log("currenttime", currentTime);
+  });
+
+  useEffect(() => {
+    console.log("rerender");
+  });
+
   return (
     <div className={styles.musicPlayer}>
       <div className={styles.lock}>
@@ -19,10 +51,7 @@ export default function WyPlayer() {
             <i className={[styles.next, styles.btnsCommon].join(" ")}></i>
           </div>
           <div className={styles.head}>
-            <img
-              className={styles.img}
-              src="//s4.music.126.net/style/web2/img/default/default_album.jpg"
-            />
+            <img className={styles.img} src={picUrl} alt="" />
             <i className={styles.mask}></i>
           </div>
           <div className={styles.play}>
@@ -83,6 +112,14 @@ export default function WyPlayer() {
           </div>
         </div>
       </div>
+
+      <audio
+        ref={audioRef}
+        src={currentSong.url}
+        onCanPlay={onCanplay}
+        //@ts-ignore
+        onTimeUpdate={onTimeupdate}
+      ></audio>
     </div>
   );
 }

@@ -1,29 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  fromEvent,
-  merge,
-  observable,
-  Observable,
-  Subscriber,
-  Subscription,
-} from "rxjs";
-import {
-  filter,
-  tap,
-  pluck,
-  map,
-  distinctUntilChanged,
-  takeUntil,
-  exhaustMap,
-} from "rxjs/internal/operators";
+import { fromEvent } from "rxjs";
+import { tap, map, takeUntil, exhaustMap } from "rxjs/internal/operators";
 import styles from "./index.module.less";
-import { SliderEventObserverConfig, SliderValue } from "./wySliderTypes";
 import WySliderHandle from "./wySliderHandle";
 import WySliderTrack from "./wySliderTrack";
-import ReactDOM from "react-dom";
-import { getElementOffset, sliderEvent } from "./wySliderHelper";
-import { getPercent, limitNumberInRange } from "../../../utils/number";
-import { inArray } from "../../../utils/array";
 
 interface WysliderProps {
   wyVertical?: boolean;
@@ -49,7 +29,6 @@ export default function WySlider(props: WysliderProps) {
    *
    */
   useEffect(() => {
-    console.log("props.buffer", bufferOffset);
     //@ts-ignore
     const mouseDown$ = fromEvent(sliderRef.current, "mousedown");
     const mouseMove$ = fromEvent(doc, "mousemove");
@@ -57,7 +36,6 @@ export default function WySlider(props: WysliderProps) {
     const subscription = mouseDown$
       .pipe(
         //@ts-ignore
-        tap((x: MouseEvent) => console.log(x.type)),
         tap(sliderEvent),
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
         //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
@@ -66,7 +44,6 @@ export default function WySlider(props: WysliderProps) {
         exhaustMap(() =>
           mouseMove$.pipe(
             //@ts-ignore
-            tap((x: MouseEvent) => console.log(x.type)),
             tap(sliderEvent),
             //tap(event => { setX(event.clientX); setY(event.clientY) }),
             //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
@@ -111,7 +88,6 @@ export default function WySlider(props: WysliderProps) {
   };
 
   const getElementOffset = (el: HTMLElement) => {
-    console.log("el", el);
     if (!el.getClientRects().length) {
       return {
         top: 0,
