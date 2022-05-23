@@ -10,6 +10,8 @@ interface WysliderProps {
   wyMin?: number;
   wyMax?: number;
   bufferOffset?: number;
+  playOffset?: number;
+  drag?: (per: number) => void;
 }
 
 export default function WySlider(props: WysliderProps) {
@@ -18,11 +20,16 @@ export default function WySlider(props: WysliderProps) {
     wyMin = 0,
     wyMax = 100,
     bufferOffset = 0,
+    playOffset = 0,
   } = props;
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
   const doc = document;
+
+  useEffect(() => {
+    setOffset(playOffset);
+  }, [playOffset]);
 
   /**
    * subscribe mousedown and setstate,after that aubscribe mousemove and setstate if mouse moves until mouse up.
@@ -40,7 +47,12 @@ export default function WySlider(props: WysliderProps) {
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
         //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
         map((event: MouseEvent) => (wyVertical ? event.pageY : event.pageX)),
-        tap((position) => setOffset(findClosestValue(position))),
+        tap((position) => {
+          setOffset(findClosestValue(position));
+          console.log("offset", offset);
+          //@ts-ignore
+          props.drag(findClosestValue(position));
+        }),
         exhaustMap(() =>
           mouseMove$.pipe(
             //@ts-ignore
@@ -50,7 +62,11 @@ export default function WySlider(props: WysliderProps) {
             map((event: MouseEvent) =>
               wyVertical ? event.pageY : event.pageX
             ),
-            tap((position) => setOffset(findClosestValue(position))),
+            tap((position) => {
+              setOffset(findClosestValue(position));
+              //@ts-ignore
+              props.drag(findClosestValue(position));
+            }),
             takeUntil(mouseUp$)
           )
         )
@@ -59,7 +75,7 @@ export default function WySlider(props: WysliderProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  });
 
   const findClosestValue = (position: number) => {
     const sliderLength = getSliderLength();

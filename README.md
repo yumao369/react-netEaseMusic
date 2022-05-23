@@ -53,13 +53,18 @@ still need to work:
 1.the styles of header at home page.
 2.the styles of dots of carousel at home page.
 3.resolve
+4.optional chaining (?.) Parsing error: Expression expected.eslint(solved by re-installiing eslint in version 7.5.0 can compile successfully,but still have this problem in the code.Check this problem in wyPlayer component.)
 
 obstacles:
 1.How to deal with the less styles,as the less modules in react has an unique global variable name,but for some styles,I want to use the same classname everywhere.
-2.how to add resole to ensure that the components are loaded after the data is loaded every time, so as to avoid empty components that affect the user experience.
+2.how to add resolve to ensure that the components are loaded after the data is loaded every time, so as to avoid empty components that affect the user experience.
+3.How to set state in observable of fromEvent,cause every time I set state when I subscribe the observable,the component will be rerendered,unsubscribing from observables.
+4.how to get the value of [(ngmodel)] in child component in angular.You can see the proble in wy-player component.
+5.if you pass a state from parent to child and use this state in observables,data will not change if you don't unsubscribe this observable.
 
-
-solutions:
-1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
-  https://angular.io/guide/view-encapsulation#inspect-generated-css
-  for example:in component wyCarousel,for the second div,we need it to be displayed as a wrap.We already have .wrap class that could be used every,but we have some unique styles for this particular wrap,so we can make it possibel like what I have done.
+solutions: 1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
+https://angular.io/guide/view-encapsulation#inspect-generated-css
+for example:in component wyCarousel,for the second div,we need it to be displayed as a wrap.We already have .wrap class that could be used every,but we have some unique styles for this particular wrap,so we can make it possibel like what I have done.
+3.add a dependency to useeffect hook.Please look at the questions I asked at stack overflow and WySlider component in this project.
+4.use ControlvalueAccessor.Look at this artical and answer one https://stackoverflow.com/questions/41350584/angular2-pass-ngmodel-to-a-child-component .Look at this example of how to simply use ngmodel and controvalueaccessor https://github.com/yumao369/angularTest
+5.You can find this instance in wyPlayer and wySlider.There is a simple example of how this means.https://codesandbox.io/s/green-resonance-w4dsh8?file=/src/App.js . When you click the number of this example,the number will be added by 1.Then if you click bbb,you will see the latest number in the console.If you click ccc,you will see the initial number.

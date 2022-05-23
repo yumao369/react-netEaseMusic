@@ -57,5 +57,6 @@ export const selectSongList = (state: RootState) => state.playReducer.songList
 export const selectPlayMode = (state: RootState) => state.playReducer.playMode
 export const selectCurrentIndex = (state: RootState) => state.playReducer.currentIndex
 
+export const selectCurrentSong = (state: RootState) => state.playReducer.playList[state.playReducer.currentIndex]
 
 export default playerSlice.reducer
