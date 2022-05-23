@@ -102,11 +102,15 @@
 
 .play {
   width: 608px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .words {
   color: @white-color;
   text-shadow: 0 1px 0 @box-shadow-base;
+  height: 22px;
 }
 
 .hide {
@@ -120,12 +124,9 @@
   cursor: pointer;
 }
 
-.songs {
-  float: left;
-}
-
 .singer {
   float: left;
+  list-style: none;
 }
 
 .bar {

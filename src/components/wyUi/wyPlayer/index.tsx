@@ -1,37 +1,116 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../../../redux/hooks";
+import { formatTime } from "../../../functions/formatTime";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectSongList, setCurrentIndex } from "../../../redux/playerSlice";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
 
 export default function WyPlayer() {
 
+  const initPicUrl = "//s4.music.126.net/style/web2/img/default/default_album.jpg"
+  const initDuration = '0:00'
+  const bufferOffset = 70
+
   const audioRef = useRef<HTMLAudioElement>(null)
-  const [currentTime, setCurrentTime] = useState(0)
-  const playList = useAppSelector((state) => state.playReducer.playList)
-  const songList = useAppSelector((state) => state.playReducer.songList)
-  const currentIndex = useAppSelector((state) => state.playReducer.currentIndex)
-  const currentSong = playList[currentIndex]
-  const picUrl = currentSong ? currentSong.al.picUrl : "//s4.music.126.net/style/web2/img/default/default_album.jpg"
+  const [currentTime, setCurrentTime] = useState(initDuration)
+  const [playOffset, setPlayOffset] = useState(0)
+  const [songReady, setSongReady] = useState(false)
+  const [playing, setPlaying] = useState(false)
+
+  const dispatch = useAppDispatch()
+
+  const playList = useAppSelector(selectPlayList)
+  const songList = useAppSelector(selectSongList)
+  const currentIndex = useAppSelector(selectCurrentIndex)
+  const currentSong = useAppSelector(selectCurrentSong)
+
+  const picUrl = currentSong ? currentSong.al.picUrl : initPicUrl
+  const duration = currentSong ? formatTime(currentSong.dt / 1000) : initDuration
+
+
+  useEffect(() => {
+    setPauseAndPlay()
+  }, [playing])
 
   const onCanplay = () => {
-    //@ts-ignore
-    audioRef.current.play()
+    setSongReady(true)
+    audioRef.current?.play()
+    setPlaying(true)
   }
 
   const onTimeupdate = (e: Event) => {
-    console.log('e', e)
-    //@ts-ignore
-    setCurrentTime(e.target.currentTime)
+    if (e.target) {
+      const currentTime = (e.target as HTMLAudioElement).currentTime
+      setCurrentTime(formatTime(currentTime))
+      setPlayOffset(currentTime / (currentSong?.dt / 1000) * 100)
+    }
   }
 
-  useEffect(() => {
-    console.log('currenttime', currentTime)
-  })
+  const onPercentChagne = (per: number) => {
+    //@ts-ignore
+    audioRef.current.currentTime = (currentSong?.dt / 1000) * (per / 100)
+  }
 
-  useEffect(() => {
-    console.log('rerender')
-  })
+  const onToggle = () => {
+    if (!currentSong) {
+      if (playList.length) {
+        updateIndex(0)
+      }
+    } else {
+      if (songReady) {
+        setPlaying(!playing)
+      }
+    }
+  }
 
+  const setPauseAndPlay = () => {
+    if (playing) {
+      audioRef.current?.play()
+    } else {
+      audioRef.current?.pause()
+    }
+  }
+
+  const onPrev = (index: number) => {
+    if (!songReady) return
+    if (playList.length === 1) {
+      loop()
+    } else {
+      const newIndex = index <= 0 ? playList.length - 1 : index
+      updateIndex(newIndex)
+    }
+  }
+
+  const onNext = (index: number) => {
+    if (!songReady) return
+    if (playList.length === 1) {
+      loop()
+    } else {
+      const newIndex = index >= playList.length ? 0 : index
+      updateIndex(newIndex)
+    }
+  }
+
+  const updateIndex = (index: number) => {
+    dispatch(setCurrentIndex({ currentIndex: index }))
+    setSongReady(false)
+  }
+
+  const loop = () => {
+    //@ts-ignore
+    audioRef.current.currentTime = 0
+    audioRef.current?.play()
+  }
+
+  const renderAuthor = () => {
+    const length = currentSong?.ar.length
+    return currentSong?.ar.map((item, index) => {
+      return <li className={styles.singer} key={item.id}>
+        <a>{item.name}</a>
+        <span className={length - 1 === index ? styles.hide : ''}>/</span>
+      </li>
+    })
+  }
 
   return (
     <div className={styles.musicPlayer}>
@@ -42,32 +121,27 @@ export default function WyPlayer() {
       <div className={styles.container}>
         <div className={[styles.wrap, 'wrap'].join(" ")}>
           <div className={styles.btns}>
-            <i className={[styles.prev, styles.btnsCommon].join(' ')}></i>
-            <i className={[styles.toggle, styles.btnsCommon].join(' ')}></i>
-            <i className={[styles.next, styles.btnsCommon].join(' ')}></i>
+            <i className={[styles.prev, styles.btnsCommon].join(' ')} onClick={() => { onPrev(currentIndex - 1) }}></i>
+            <i className={[styles.toggle, styles.btnsCommon, playing ? styles.playing : ''].join(' ')} onClick={onToggle}></i>
+            <i className={[styles.next, styles.btnsCommon].join(' ')} onClick={() => { onNext(currentIndex + 1) }}></i>
           </div>
           <div className={styles.head}>
             <img className={styles.img} src={picUrl} alt="" />
             <i className={styles.mask}></i>
           </div>
           <div className={styles.play}>
-            <div className={[styles.words, styles.clearfix, styles.hide].join(" ")} >
-              <p className={styles.ellipsis}>歌名</p>
-              <ul className={[styles.songs, styles.clearfix].join(" ")}>
-                <li className={styles.singer}>
-                  <a>歌手1</a>/
-                </li>
-                <li className={styles.singer}>
-                  <a>歌手2</a>
-                </li>
+            <div className={[styles.words, styles.clearfix].join(" ")} >
+              <p className={styles.ellipsis}>{currentSong?.name}</p>
+              <ul className={styles.clearfix}>
+                {renderAuthor()}
               </ul>
             </div>
             <div className={styles.bar}>
               <div className={styles.sliderWrap}>
-                <WySlider wyMax={100} wyMin={0} wyVertical={false} bufferOffset={70} />
+                <WySlider bufferOffset={bufferOffset} playOffset={playOffset} drag={onPercentChagne} />
               </div>
               <span className={styles.time}>
-                <em>02:11</em> / 04:35
+                <em>{currentTime}</em> / {duration}
               </span>
             </div>
           </div>
@@ -92,7 +166,7 @@ export default function WyPlayer() {
 
       <audio
         ref={audioRef}
-        src={currentSong.url}
+        src={currentSong?.url}
         onCanPlay={onCanplay}
         //@ts-ignore
         onTimeUpdate={onTimeupdate}></audio>
