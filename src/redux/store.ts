@@ -1,11 +1,15 @@
-import { combineReducers, configureStore, getDefaultMiddleware } from '@reduxjs/toolkit'
-import persistReducer from 'redux-persist/es/persistReducer'
-import storage from 'redux-persist/lib/storage';
-import playReducer from './playerSlice'
+import {
+  combineReducers,
+  configureStore,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit";
+import persistReducer from "redux-persist/es/persistReducer";
+import storage from "redux-persist/lib/storage";
+import playReducer from "./playerSlice";
 
 const reducers = combineReducers({
-  playReducer
-})
+  playReducer,
+});
 
 //const persistConfig = {
 //  key: 'root',
@@ -17,13 +21,14 @@ const reducers = combineReducers({
 const store = configureStore({
   //reducer: persistedReducer,
   reducer: reducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: false
-  })
-})
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
 
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof store.getState>;
 
-export type AppDisPatch = typeof store.dispatch
+export type AppDisPatch = typeof store.dispatch;
 
-export default store
+export default store;

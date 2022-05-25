@@ -1,14 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fromEvent, merge, observable, Observable, Subscriber, Subscription } from 'rxjs';
-import { filter, tap, pluck, map, distinctUntilChanged, takeUntil, exhaustMap } from 'rxjs/internal/operators';
-import styles from "./index.module.less"
-import { SliderEventObserverConfig, SliderValue } from "./wySliderTypes";
+import { fromEvent } from "rxjs";
+import { tap, map, takeUntil, exhaustMap } from "rxjs/internal/operators";
+import styles from "./index.module.less";
 import WySliderHandle from "./wySliderHandle";
 import WySliderTrack from "./wySliderTrack";
-import ReactDOM from "react-dom";
-import { getElementOffset, sliderEvent } from "./wySliderHelper";
-import { getPercent, limitNumberInRange } from "../../../utils/number";
-import { inArray } from "../../../utils/array";
 
 interface WysliderProps {
   wyVertical?: boolean;
@@ -20,39 +15,43 @@ interface WysliderProps {
 }
 
 export default function WySlider(props: WysliderProps) {
+  const {
+    wyVertical = false,
+    wyMin = 0,
+    wyMax = 100,
+    bufferOffset = 0,
+    playOffset = 0,
+  } = props;
 
-  const { wyVertical = false, wyMin = 0, wyMax = 100, bufferOffset = 0, playOffset = 0 } = props
-
-  const sliderRef = useRef<HTMLDivElement>(null)
-  const [offset, setOffset] = useState(0)
-  const doc = document
-
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState(0);
+  const doc = document;
 
   useEffect(() => {
-    setOffset(playOffset)
-  }, [playOffset])
+    setOffset(playOffset);
+  }, [playOffset]);
 
   /**
    * subscribe mousedown and setstate,after that aubscribe mousemove and setstate if mouse moves until mouse up.
-   * 
+   *
    */
   useEffect(() => {
     //@ts-ignore
-    const mouseDown$ = fromEvent(sliderRef.current, 'mousedown')
-    const mouseMove$ = fromEvent(doc, 'mousemove');
-    const mouseUp$ = fromEvent(doc, 'mouseup');
+    const mouseDown$ = fromEvent(sliderRef.current, "mousedown");
+    const mouseMove$ = fromEvent(doc, "mousemove");
+    const mouseUp$ = fromEvent(doc, "mouseup");
     const subscription = mouseDown$
       .pipe(
         //@ts-ignore
         tap(sliderEvent),
         //tap(event => { setX(event.clientX); setY(event.clientY) }),
         //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
-        map((event: MouseEvent) => wyVertical ? event.pageY : event.pageX),
-        tap(position => {
-          setOffset(findClosestValue(position))
-          console.log('offset', offset)
+        map((event: MouseEvent) => (wyVertical ? event.pageY : event.pageX)),
+        tap((position) => {
+          setOffset(findClosestValue(position));
+          console.log("offset", offset);
           //@ts-ignore
-          props.drag(findClosestValue(position))
+          props.drag(findClosestValue(position));
         }),
         exhaustMap(() =>
           mouseMove$.pipe(
@@ -60,11 +59,13 @@ export default function WySlider(props: WysliderProps) {
             tap(sliderEvent),
             //tap(event => { setX(event.clientX); setY(event.clientY) }),
             //map((event: MouseEvent) => wyVertical ? event.clientY : event.clientX),
-            map((event: MouseEvent) => wyVertical ? event.pageY : event.pageX),
-            tap(position => {
-              setOffset(findClosestValue(position))
+            map((event: MouseEvent) =>
+              wyVertical ? event.pageY : event.pageX
+            ),
+            tap((position) => {
+              setOffset(findClosestValue(position));
               //@ts-ignore
-              props.drag(findClosestValue(position))
+              props.drag(findClosestValue(position));
             }),
             takeUntil(mouseUp$)
           )
@@ -72,36 +73,42 @@ export default function WySlider(props: WysliderProps) {
       )
       .subscribe();
     return () => {
-      subscription.unsubscribe()
-    }
-  })
-
+      subscription.unsubscribe();
+    };
+  });
 
   const findClosestValue = (position: number) => {
     const sliderLength = getSliderLength();
     const sliderStart = getSliderStartPosition();
-    const ratio = limitNumberInRange((position - sliderStart) / sliderLength, 0, 1);
+    const ratio = limitNumberInRange(
+      (position - sliderStart) / sliderLength,
+      0,
+      1
+    );
     const ratioTrue = wyVertical ? 1 - ratio : ratio;
     return ratioTrue * (wyMax - wyMin) + wyMin;
-  }
+  };
 
   const getSliderLength = () => {
-    //@ts-ignore
-    return wyVertical ? sliderRef.current.clientHeight : sliderRef.current.clientWidth
-  }
+    return wyVertical
+      ? //@ts-ignore
+        sliderRef.current.clientHeight
+      : //@ts-ignore
+        sliderRef.current.clientWidth;
+  };
 
   const getSliderStartPosition = () => {
     //@ts-ignore
     const offset = getElementOffset(sliderRef.current);
     return wyVertical ? offset.top : offset.left;
-  }
+  };
 
   const getElementOffset = (el: HTMLElement) => {
     if (!el.getClientRects().length) {
       return {
         top: 0,
-        left: 0
-      }
+        left: 0,
+      };
     }
 
     //获得元素相对于视窗的位置
@@ -112,26 +119,34 @@ export default function WySlider(props: WysliderProps) {
       //@ts-ignore
       top: rect.top + win.pageYOffset,
       //@ts-ignore
-      left: rect.left + win.pageXOffset
-    }
-  }
+      left: rect.left + win.pageXOffset,
+    };
+  };
 
   const limitNumberInRange = (val: number, min: number, max: number) => {
     return Math.min(Math.max(val, min), max);
-  }
+  };
 
   const sliderEvent = (e: Event) => {
     e.stopPropagation();
     e.preventDefault();
-  }
-
-
+  };
 
   return (
-    <div className={[styles.wySlider, wyVertical ? styles.wySliderVertical : ''].join(' ')} ref={sliderRef}>
-      <WySliderTrack wyLength={bufferOffset} wyVertical={wyVertical} wyBuffer={true} />
+    <div
+      className={[
+        styles.wySlider,
+        wyVertical ? styles.wySliderVertical : "",
+      ].join(" ")}
+      ref={sliderRef}
+    >
+      <WySliderTrack
+        wyLength={bufferOffset}
+        wyVertical={wyVertical}
+        wyBuffer={true}
+      />
       <WySliderTrack wyLength={offset} wyVertical={wyVertical} />
       <WySliderHandle wyOffset={offset} wyVertical={wyVertical} />
     </div>
-  )
+  );
 }

@@ -17,46 +17,57 @@ export type PlayState = {
 
   // 当前正在播放的索引
   currentIndex: number;
-}
+};
 
 const defaultState: PlayState = {
   playing: false,
   songList: [],
   playList: [],
-  playMode: { type: 'loop', label: '循环' },
-  currentIndex: -1
-}
+  playMode: { type: "loop", label: "循环" },
+  currentIndex: -1,
+};
 
 export const playerSlice = createSlice({
-  name: 'player',
+  name: "player",
   initialState: defaultState,
   reducers: {
     setPlaying: (state, action: PayloadAction<{ playing: boolean }>) => {
-      return { ...state, playing: action.payload.playing }
+      return { ...state, playing: action.payload.playing };
     },
     setPlayList: (state, action: PayloadAction<{ playList: Song[] }>) => {
-      return { ...state, playList: action.payload.playList }
+      return { ...state, playList: action.payload.playList };
     },
     setSongList: (state, action: PayloadAction<{ songList: Song[] }>) => {
-      return { ...state, songList: action.payload.songList }
+      return { ...state, songList: action.payload.songList };
     },
     setPlayMode: (state, action: PayloadAction<{ playMode: PlayMode }>) => {
-      return { ...state, playMode: action.payload.playMode }
+      return { ...state, playMode: action.payload.playMode };
     },
-    setCurrentIndex: (state, action: PayloadAction<{ currentIndex: number }>) => {
-      return { ...state, currentIndex: action.payload.currentIndex }
+    setCurrentIndex: (
+      state,
+      action: PayloadAction<{ currentIndex: number }>
+    ) => {
+      return { ...state, currentIndex: action.payload.currentIndex };
     },
-  }
-})
+  },
+});
 
-export const { setPlaying, setPlayList, setSongList, setPlayMode, setCurrentIndex } = playerSlice.actions
+export const {
+  setPlaying,
+  setPlayList,
+  setSongList,
+  setPlayMode,
+  setCurrentIndex,
+} = playerSlice.actions;
 
-export const selectPlaying = (state: RootState) => state.playReducer.playing
-export const selectPlayList = (state: RootState) => state.playReducer.playList
-export const selectSongList = (state: RootState) => state.playReducer.songList
-export const selectPlayMode = (state: RootState) => state.playReducer.playMode
-export const selectCurrentIndex = (state: RootState) => state.playReducer.currentIndex
+export const selectPlaying = (state: RootState) => state.playReducer.playing;
+export const selectPlayList = (state: RootState) => state.playReducer.playList;
+export const selectSongList = (state: RootState) => state.playReducer.songList;
+export const selectPlayMode = (state: RootState) => state.playReducer.playMode;
+export const selectCurrentIndex = (state: RootState) =>
+  state.playReducer.currentIndex;
 
-export const selectCurrentSong = (state: RootState) => state.playReducer.playList[state.playReducer.currentIndex]
+export const selectCurrentSong = (state: RootState) =>
+  state.playReducer.playList[state.playReducer.currentIndex];
 
-export default playerSlice.reducer
+export default playerSlice.reducer;
