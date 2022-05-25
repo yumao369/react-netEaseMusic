@@ -65,8 +65,10 @@ export default function WyPlayer() {
   }
 
   const onPercentChagne = (per: number) => {
-    //@ts-ignore
-    audioRef.current.currentTime = (currentSong?.dt / 1000) * (per / 100)
+    if (currentSong) {
+      //@ts-ignore
+      audioRef.current.currentTime = (currentSong?.dt / 1000) * (per / 100)
+    }
   }
 
   const toggleVolPanel = () => {

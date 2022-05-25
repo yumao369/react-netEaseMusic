@@ -51,7 +51,9 @@ export default function WySlider(props: WysliderProps) {
           setOffset(findClosestValue(position));
           console.log("offset", offset);
           //@ts-ignore
-          props.drag(findClosestValue(position));
+          if (props.drag) {
+            props.drag(findClosestValue(position))
+          }
         }),
         exhaustMap(() =>
           mouseMove$.pipe(
@@ -65,7 +67,9 @@ export default function WySlider(props: WysliderProps) {
             tap((position) => {
               setOffset(findClosestValue(position));
               //@ts-ignore
-              props.drag(findClosestValue(position));
+              if (props.drag) {
+                props.drag(findClosestValue(position))
+              }
             }),
             takeUntil(mouseUp$)
           )
@@ -92,9 +96,9 @@ export default function WySlider(props: WysliderProps) {
   const getSliderLength = () => {
     return wyVertical
       ? //@ts-ignore
-        sliderRef.current.clientHeight
+      sliderRef.current.clientHeight
       : //@ts-ignore
-        sliderRef.current.clientWidth;
+      sliderRef.current.clientWidth;
   };
 
   const getSliderStartPosition = () => {
