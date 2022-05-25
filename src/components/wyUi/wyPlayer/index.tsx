@@ -2,9 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectSongList, setCurrentIndex } from "../../../redux/playerSlice";
+import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayMode } from "../../../redux/playerSlice";
+import { PlayMode } from "../../../types/GlobalTypes";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
+
+const modeTypes: PlayMode[] = [{
+  type: 'loop',
+  label: '循环'
+}, {
+  type: 'random',
+  label: '随机'
+}, {
+  type: 'singleLoop',
+  label: '单曲循环'
+}];
 
 export default function WyPlayer() {
 
@@ -18,6 +30,7 @@ export default function WyPlayer() {
   const [playOffset, setPlayOffset] = useState(0)
   const [songReady, setSongReady] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [modeCount, setModeCount] = useState<0 | 1 | 2>(0)
   const [showVolPanel, setShowVolPanel] = useState(false)
   const [selfClick, setSelfClick] = useState(false)
 
@@ -26,6 +39,7 @@ export default function WyPlayer() {
   const playList = useAppSelector(selectPlayList)
   const songList = useAppSelector(selectSongList)
   const currentIndex = useAppSelector(selectCurrentIndex)
+  const mode = useAppSelector(selectPlayMode)
   const currentSong = useAppSelector(selectCurrentSong)
 
   const picUrl = currentSong ? currentSong.al.picUrl : initPicUrl
@@ -46,6 +60,10 @@ export default function WyPlayer() {
     }
   })
 
+  useEffect(() => {
+
+  })
+
   const handleDocClick = () => {
     setShowVolPanel(false)
   }
@@ -62,6 +80,14 @@ export default function WyPlayer() {
       setCurrentTime(formatTime(currentTime))
       setPlayOffset(currentTime / (currentSong?.dt / 1000) * 100)
     }
+  }
+
+  const changeMode = () => {
+
+  }
+
+  const handleModeChange = () => {
+
   }
 
   const onPercentChagne = (per: number) => {
@@ -83,6 +109,11 @@ export default function WyPlayer() {
     e.stopPropagation();
     e.preventDefault();
     setSelfClick(true)
+  }
+
+  const onVolumeChange = (vol: number) => {
+    //@ts-ignore
+    audioRef.current.volume = vol / 100
   }
 
   const onToggle = () => {
@@ -123,6 +154,10 @@ export default function WyPlayer() {
       const newIndex = index >= playList.length ? 0 : index
       updateIndex(newIndex)
     }
+  }
+
+  const onEnded = () => {
+
   }
 
   const updateIndex = (index: number) => {
@@ -195,7 +230,7 @@ export default function WyPlayer() {
             </p>
 
             <div className={[styles.controlVol, showVolPanel ? '' : styles.hide].join(' ')}>
-              <WySlider wyVertical={true} />
+              <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
         </div>
