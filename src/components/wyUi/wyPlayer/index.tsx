@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { fromEvent, Subscription } from "rxjs";
 import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectSongList, setCurrentIndex } from "../../../redux/playerSlice";
@@ -10,12 +11,15 @@ export default function WyPlayer() {
   const initPicUrl = "//s4.music.126.net/style/web2/img/default/default_album.jpg"
   const initDuration = '0:00'
   const bufferOffset = 70
+  const doc = document
 
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(initDuration)
   const [playOffset, setPlayOffset] = useState(0)
   const [songReady, setSongReady] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [showVolPanel, setShowVolPanel] = useState(false)
+  const [selfClick, setSelfClick] = useState(false)
 
   const dispatch = useAppDispatch()
 
@@ -31,6 +35,20 @@ export default function WyPlayer() {
   useEffect(() => {
     setPauseAndPlay()
   }, [playing])
+
+  useEffect(() => {
+    if (selfClick) {
+      const docClick$ = fromEvent(doc, 'click')
+      const subscription = docClick$.subscribe(handleDocClick)
+      return () => {
+        subscription.unsubscribe()
+      }
+    }
+  })
+
+  const handleDocClick = () => {
+    setShowVolPanel(false)
+  }
 
   const onCanplay = () => {
     setSongReady(true)
@@ -49,6 +67,20 @@ export default function WyPlayer() {
   const onPercentChagne = (per: number) => {
     //@ts-ignore
     audioRef.current.currentTime = (currentSong?.dt / 1000) * (per / 100)
+  }
+
+  const toggleVolPanel = () => {
+    togglePanel()
+  }
+
+  const togglePanel = () => {
+    setShowVolPanel(!showVolPanel)
+  }
+
+  const selfClickChange = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSelfClick(true)
   }
 
   const onToggle = () => {
@@ -113,7 +145,10 @@ export default function WyPlayer() {
   }
 
   return (
-    <div className={styles.musicPlayer}>
+    <div
+      className={styles.musicPlayer}
+      //@ts-ignore
+      onClick={selfClickChange}>
       <div className={styles.lock}>
         <div className={styles.left}><i className={styles.leftP}></i></div>
       </div>
@@ -151,13 +186,13 @@ export default function WyPlayer() {
             <i className={[styles.share, styles.operCommon].join(' ')} title="分享"></i>
           </div>
           <div className={styles.ctrl}>
-            <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量"></i>
+            <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量" onClick={toggleVolPanel}></i>
             <i className={[styles.loop, styles.ctrlCommon].join(' ')} title="循环"></i>
             <p className={styles.open}>
               <span className={styles.openSpan}></span>
             </p>
 
-            <div className={styles.controlVol}>
+            <div className={[styles.controlVol, showVolPanel ? '' : styles.hide].join(' ')}>
               <WySlider wyVertical={true} />
             </div>
           </div>
