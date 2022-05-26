@@ -2,21 +2,26 @@ import React, { useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayMode } from "../../../redux/playerSlice";
-import { PlayMode } from "../../../types/GlobalTypes";
+import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayList, setPlayMode } from "../../../redux/playerSlice";
+import { PlayMode, Song } from "../../../types/GlobalTypes";
+import { shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
 
-const modeTypes: PlayMode[] = [{
-  type: 'loop',
-  label: '循环'
-}, {
-  type: 'random',
-  label: '随机'
-}, {
-  type: 'singleLoop',
-  label: '单曲循环'
-}];
+const modeTypes: PlayMode[] = [
+  {
+    type: 'loop',
+    label: '循环'
+  }, {
+    type: 'random',
+    label: '随机'
+  }, {
+    type: 'singleLoop',
+    label: '单曲循环'
+  }
+];
+
+const modes: string[] = ['loop', 'random', 'singleLoop']
 
 export default function WyPlayer() {
 
@@ -61,8 +66,8 @@ export default function WyPlayer() {
   })
 
   useEffect(() => {
-
-  })
+    handleModeChange()
+  }, [mode])
 
   const handleDocClick = () => {
     setShowVolPanel(false)
@@ -83,11 +88,24 @@ export default function WyPlayer() {
   }
 
   const changeMode = () => {
-
+    const modeCount = modes.indexOf(mode.type) + 1
+    dispatch(setPlayMode({ playMode: modeTypes[modeCount % 3] }))
   }
 
   const handleModeChange = () => {
+    if (songList) {
+      let list = songList.slice()
+      if (mode.type === 'random') {
+        list = shuffle(songList)
+        updateCurrentIndex(list, currentSong)
+        dispatch(setPlayList({ playList: list }))
+      }
+    }
+  }
 
+  const updateCurrentIndex = (list: Song[], song: Song) => {
+    const newIndex = list.findIndex(item => item.id === song.id)
+    dispatch(setCurrentIndex({ currentIndex: newIndex }))
   }
 
   const onPercentChagne = (per: number) => {
@@ -157,7 +175,12 @@ export default function WyPlayer() {
   }
 
   const onEnded = () => {
-
+    setPlaying(false)
+    if (mode.type === 'singleLoop') {
+      loop();
+    } else {
+      onNext(currentIndex + 1);
+    }
   }
 
   const updateIndex = (index: number) => {
@@ -224,7 +247,7 @@ export default function WyPlayer() {
           </div>
           <div className={styles.ctrl}>
             <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量" onClick={toggleVolPanel}></i>
-            <i className={[styles.loop, styles.ctrlCommon].join(' ')} title="循环"></i>
+            <i className={[styles[mode.type], styles.ctrlCommon].join(' ')} title={mode.label} onClick={changeMode}></i>
             <p className={styles.open}>
               <span className={styles.openSpan}></span>
             </p>
@@ -241,7 +264,8 @@ export default function WyPlayer() {
         src={currentSong?.url}
         onCanPlay={onCanplay}
         //@ts-ignore
-        onTimeUpdate={onTimeupdate}></audio>
+        onTimeUpdate={onTimeupdate}
+        onEnded={onEnded}></audio>
     </div>
   )
 }
