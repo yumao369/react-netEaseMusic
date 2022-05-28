@@ -7,6 +7,7 @@ import { PlayMode, Song } from "../../../types/GlobalTypes";
 import { shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
+import WyPlayerPanel from "./wyPlayerPanel";
 
 const modeTypes: PlayMode[] = [
   {
@@ -35,8 +36,8 @@ export default function WyPlayer() {
   const [playOffset, setPlayOffset] = useState(0)
   const [songReady, setSongReady] = useState(false)
   const [playing, setPlaying] = useState(false)
-  const [modeCount, setModeCount] = useState<0 | 1 | 2>(0)
   const [showVolPanel, setShowVolPanel] = useState(false)
+  const [showListPane, setShowListPanel] = useState(false)
   const [selfClick, setSelfClick] = useState(false)
 
   const dispatch = useAppDispatch()
@@ -71,6 +72,7 @@ export default function WyPlayer() {
 
   const handleDocClick = () => {
     setShowVolPanel(false)
+    setShowListPanel(false)
   }
 
   const onCanplay = () => {
@@ -116,11 +118,11 @@ export default function WyPlayer() {
   }
 
   const toggleVolPanel = () => {
-    togglePanel()
+    setShowVolPanel(!showVolPanel)
   }
 
-  const togglePanel = () => {
-    setShowVolPanel(!showVolPanel)
+  const toggleListPanel = () => {
+    setShowListPanel(!showListPane)
   }
 
   const selfClickChange = (e: MouseEvent) => {
@@ -248,7 +250,7 @@ export default function WyPlayer() {
           <div className={styles.ctrl}>
             <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量" onClick={toggleVolPanel}></i>
             <i className={[styles[mode.type], styles.ctrlCommon].join(' ')} title={mode.label} onClick={changeMode}></i>
-            <p className={styles.open}>
+            <p className={styles.open} onClick={toggleListPanel}>
               <span className={styles.openSpan}></span>
             </p>
 
@@ -256,6 +258,7 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
+          <WyPlayerPanel songList={songList} currentSong={currentSong} currentIndex={currentIndex} show={showListPane} />
         </div>
       </div>
 
