@@ -48,6 +48,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 summary:
 1.Restart the project after adding .env file,or it may not work.
 2.Having services in project.
+3.notice that some HTML tags have user agent stylesheet.
 
 still need to work:
 1.the styles of header at home page.
