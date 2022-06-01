@@ -49,6 +49,8 @@ summary:
 1.Restart the project after adding .env file,or it may not work.
 2.Having services in project.
 3.notice that some HTML tags have user agent stylesheet.
+4.scroll https://www.robinwieruch.de/react-scroll-to-item/
+5.Do not call hooks inside loops,or you will get an error.look at the article attached below to learn about this problem.https://stackoverflow.com/questions/53472795/uncaught-error-rendered-fewer-hooks-than-expected-this-may-be-caused-by-an-acc
 
 still need to work:
 1.the styles of header at home page.

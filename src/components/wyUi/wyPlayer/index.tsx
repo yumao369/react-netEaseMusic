@@ -161,7 +161,7 @@ export default function WyPlayer() {
     if (playList.length === 1) {
       loop()
     } else {
-      const newIndex = index <= 0 ? playList.length - 1 : index
+      const newIndex = index < 0 ? playList.length - 1 : index
       updateIndex(newIndex)
     }
   }
@@ -194,6 +194,10 @@ export default function WyPlayer() {
     //@ts-ignore
     audioRef.current.currentTime = 0
     audioRef.current?.play()
+  }
+
+  const onChangeSong = (song: Song) => {
+    updateCurrentIndex(playList, song)
   }
 
   const renderAuthor = () => {
@@ -258,7 +262,7 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
-          <WyPlayerPanel songList={songList} currentSong={currentSong} currentIndex={currentIndex} show={showListPane} />
+          <WyPlayerPanel songList={songList} currentSong={currentSong} currentIndex={currentIndex} show={showListPane} onChangeSong={onChangeSong} />
         </div>
       </div>
 
