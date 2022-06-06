@@ -51,6 +51,10 @@ summary:
 3.notice that some HTML tags have user agent stylesheet.
 4.scroll https://www.robinwieruch.de/react-scroll-to-item/
 5.Do not call hooks inside loops,or you will get an error.look at the article attached below to learn about this problem.https://stackoverflow.com/questions/53472795/uncaught-error-rendered-fewer-hooks-than-expected-this-may-be-caused-by-an-acc
+6.if you want to get a child component's method in parent component,you can use ref.But this require you to get the ref of a custom compoment,which is a little bit confused.
+All you need to do is to use forwardRef and useImperativeHandle.You can see how I use these two method in WyPlayerPanel(parent component) and WyScroll(child component).In this example,I use wyscroll's method in wyplayerpanel.These two articles refer to how to use forwardRedf and useImperativeHanle to achieve our goal.
+https://ilxanlar.medium.com/react-forwardref-in-two-minutes-2f33071c72fa
+https://segmentfault.com/a/1190000040758640
 
 still need to work:
 1.the styles of header at home page.

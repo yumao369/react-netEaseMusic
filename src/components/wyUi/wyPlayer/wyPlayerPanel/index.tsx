@@ -2,6 +2,7 @@ import React, { RefObject, useEffect, useRef } from "react";
 import { formatTime } from "../../../../functions/formatTime";
 import { Singer, Song } from "../../../../types/GlobalTypes";
 import styles from "./index.module.less"
+import WyScroll, { WyScrollRef } from "./scroll";
 
 interface WyPlayerPanelProps {
   songList: Song[];
@@ -13,26 +14,16 @@ interface WyPlayerPanelProps {
 
 export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
-  /*const refs = props.songList.reduce((acc: { [key: string]: RefObject<HTMLLIElement> }, item: Song) => {
-    acc[item.id] = useRef<HTMLLIElement>(null);
-    return acc;
-  }, {})*/
-
-  const playListRef = useRef<(HTMLLIElement | null)[]>([])
+  const songListRef = useRef<WyScrollRef | null>(null)
 
   useEffect(() => {
-    playListRef.current = playListRef.current.slice(0, props.songList.length)
-  }, [props.songList])
+    refreshScroll()
+  }, [props.show])
 
-  const handleClick = (index: number) => {
-    /*refs[id].current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    })*/
-    playListRef.current[index]?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-    })
+  const refreshScroll = () => {
+    if (props.show) {
+      songListRef.current?.refreshScroll()
+    }
   }
 
   const renderSongSinger = (singers: Singer[]) => {
@@ -55,20 +46,11 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   const renderPlayList = () => {
     return props.songList.map((item, index) => {
-      /*const ref = useRef<HTMLLIElement | null>(null)
-      const handleClick = () => {
-        ref.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        })
-      }*/
       return (
         <li
           key={item.id}
           className={props.currentIndex === index ? styles.current : ''}
-          onClick={() => { props.onChangeSong(item); handleClick(index) }}
-          ref={el => playListRef.current[index] = el}
-        //ref={refs[item.id]}
+          onClick={() => props.onChangeSong(item)}
         >
           <i className={[styles.col, styles.arrow].join(' ')}></i>
           <div className={[styles.col, styles.name, styles.ellipsis].join(' ')}>{item.name}</div>
@@ -110,9 +92,11 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
         <img src="//music.163.com/api/img/blur/109951163826278397" className={styles.imgbg} />
         <div className={styles.msk}></div>
         <div className={styles.listWrap}>
-          <ul>
-            {renderPlayList()}
-          </ul >
+          <WyScroll data={props.songList} ref={songListRef} >
+            <ul>
+              {renderPlayList()}
+            </ul >
+          </WyScroll>
         </div >
         <ul>
           歌词
