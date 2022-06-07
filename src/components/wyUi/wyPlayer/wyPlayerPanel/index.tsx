@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useRef } from "react";
+import React, { ReactElement, RefObject, useEffect, useRef, useState } from "react";
 import { formatTime } from "../../../../functions/formatTime";
 import { Singer, Song } from "../../../../types/GlobalTypes";
 import styles from "./index.module.less"
@@ -14,16 +14,30 @@ interface WyPlayerPanelProps {
 
 export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
+  const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
   const songListRef = useRef<WyScrollRef | null>(null)
 
   useEffect(() => {
     refreshScroll()
   }, [props.show])
 
+  useEffect(() => {
+    console.log('scrollEndHeight', scrollEndHeight)
+  }, [scrollEndHeight])
+
   const refreshScroll = () => {
     if (props.show) {
+      console.log('songlist', (songListRef.current?.children as ReactElement).props.children[props.currentIndex])
       songListRef.current?.refreshScroll()
     }
+  }
+
+  const getScrollEndHeight = (y: number) => {
+    setScrollEndHeight(y)
+  }
+
+  const scrollToCurrent = () => {
+
   }
 
   const renderSongSinger = (singers: Singer[]) => {
@@ -92,7 +106,7 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
         <img src="//music.163.com/api/img/blur/109951163826278397" className={styles.imgbg} />
         <div className={styles.msk}></div>
         <div className={styles.listWrap}>
-          <WyScroll data={props.songList} ref={songListRef} >
+          <WyScroll data={props.songList} ref={songListRef} getScrollEndHeight={getScrollEndHeight}>
             <ul>
               {renderPlayList()}
             </ul >

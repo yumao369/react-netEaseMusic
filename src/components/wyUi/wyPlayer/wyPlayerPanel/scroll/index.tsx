@@ -1,17 +1,24 @@
-import React, { forwardRef, ForwardRefRenderFunction, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { Children, forwardRef, ForwardRefRenderFunction, ReactElement, ReactNode, useEffect, useImperativeHandle, useRef, useState } from "react";
 import BScroll from "@better-scroll/core"
+import ScrollBar from '@better-scroll/scroll-bar';
+import MouseWheel from '@better-scroll/mouse-wheel';
 import styles from "./index.module.less"
 import { timer } from "rxjs";
 import { Song } from "../../../../../types/GlobalTypes";
 import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
 
+BScroll.use(MouseWheel);
+BScroll.use(ScrollBar);
+
 interface WyScrollProps {
   children: React.ReactNode;
   data: Song[];
+  getScrollEndHeight: (y: number) => void
 }
 
 export interface WyScrollRef {
-  refreshScroll: () => void
+  refreshScroll: () => void;
+  children: ReactNode
 }
 
 const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, ref) => {
@@ -27,22 +34,30 @@ const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, r
   }, [])
 
   useEffect(() => {
+    listenScrollEnd()
+  }, [bs])
+
+  useEffect(() => {
     refreshScroll()
   }, [props.data])
 
   useImperativeHandle(ref, () => ({
-    refreshScroll: refreshScroll
+    refreshScroll: refreshScroll,
+    children: props.children
   }))
 
   const initBS = () => {
-    console.log('wrapref.current', wrapRef.current)
     if (wrapRef.current) {
-      setBs(new BScroll(wrapRef.current))
+      setBs(new BScroll(wrapRef.current, {
+        scrollbar: {
+          interactive: true
+        },
+        mouseWheel: {}
+      }))
     }
   }
 
   const refresh = () => {
-    console.log('refresh', 'bs', bs, bs?.refresh)
     bs?.refresh()
   }
 
@@ -50,6 +65,14 @@ const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, r
     timer(50).subscribe(() => {
       refresh()
     })
+  }
+
+  const listenScrollEnd = () => {
+    bs?.on('scrollEnd', ({ y }: { y: number }) => props.getScrollEndHeight(y))
+  }
+
+  const scrollToElement = (el: HTMLElement, time: number, offsetX: number | boolean, offsetY: number | boolean) => {
+    bs?.scrollToElement(el, time, offsetX, offsetY)
   }
 
   return (
