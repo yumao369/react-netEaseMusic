@@ -103,7 +103,9 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
       </div >
 
       <div className={styles.bd}>
-        <img src="//music.163.com/api/img/blur/109951163826278397" className={styles.imgbg} />
+        <div className={styles.imgPack}>
+          <img src="//music.163.com/api/img/blur/109951163826278397" className={styles.imgbg} />
+        </div>
         <div className={styles.msk}></div>
         <div className={styles.listWrap}>
           <WyScroll data={props.songList} ref={songListRef} getScrollEndHeight={getScrollEndHeight}>
@@ -113,7 +115,36 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
           </WyScroll>
         </div >
         <ul>
-          歌词
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
+          <li>
+            中文 <br /> 英文
+          </li>
         </ul>
       </div >
     </div >

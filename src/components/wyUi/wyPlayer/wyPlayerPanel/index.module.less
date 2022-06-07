@@ -109,11 +109,16 @@
   .icon("../images/playlist_bg.png", 976px, 260px);
   background-position: -1014px 0;
   background-repeat: repeat-y;
-
-  .imgbg {
+  .imgPack {
     position: absolute;
     left: 2px;
     top: 0;
+    width: 980px;
+    height: 260px;
+    overflow: hidden;
+  }
+
+  .imgbg {
     width: 980px;
     height: auto;
     opacity: 0.2;
@@ -135,10 +140,13 @@
     z-index: 3;
     height: 260px;
     width: 553px;
+    overflow: hidden;
     color: @wy-text-prev-color;
+    ul::-webkit-scrollbar {
+      display: none;
+    }
     ul {
       padding-inline-start: 0px;
-
       li {
         display: flex;
         flex-direction: row;
