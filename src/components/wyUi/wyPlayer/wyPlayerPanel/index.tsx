@@ -19,7 +19,18 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   useEffect(() => {
     refreshScroll()
+    setTimeout(() => {
+      if (props.currentSong) {
+        scrollToCurrent();
+      }
+    }, 80);
   }, [props.show])
+
+  useEffect(() => {
+    if (props.show) {
+      scrollToCurrent()
+    }
+  }, [props.currentIndex])
 
   useEffect(() => {
     console.log('scrollEndHeight', scrollEndHeight)
@@ -27,7 +38,9 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   const refreshScroll = () => {
     if (props.show) {
-      console.log('songlist', (songListRef.current?.children as ReactElement).props.children[props.currentIndex])
+      //console.log('currentSongOffsetHeight', ((songListRef.current?.children as ReactElement).props.children[props.currentIndex] as HTMLElement).offsetHeight)
+      //console.log('currentSongOffsetHeight', (songListRef.current?.children?.item(0)?.children.item(props.currentIndex) as HTMLElement).offsetTop)
+      //console.log('currentSongOffsetHeight', (songListRef.current?.children?.item(props.currentIndex) as HTMLElement).offsetTop)
       songListRef.current?.refreshScroll()
     }
   }
@@ -37,14 +50,18 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
   }
 
   const scrollToCurrent = () => {
-
+    const currentLi = songListRef.current?.children?.item(props.currentIndex) as HTMLElement
+    const offsetTop = currentLi.offsetTop
+    const offsetHeight = currentLi.offsetHeight
+    if (((offsetTop - Math.abs(scrollEndHeight)) > offsetHeight * 5 || (offsetTop < Math.abs(scrollEndHeight)))) {
+      songListRef.current?.scrollToElement(currentLi, 300, false, false)
+    }
   }
 
   const renderSongSinger = (singers: Singer[]) => {
     const singerNum = singers.length
     return singers.map((item, index) => {
       return (
-
         <div className={styles.singerItem} >
           <a className={[styles.col, styles.ellipsis].join(' ')}>{item.name}</a>
           {index === singerNum - 1 ? (

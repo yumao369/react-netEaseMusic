@@ -55,6 +55,8 @@ summary:
 All you need to do is to use forwardRef and useImperativeHandle.You can see how I use these two method in WyPlayerPanel(parent component) and WyScroll(child component).In this example,I use wyscroll's method in wyplayerpanel.These two articles refer to how to use forwardRedf and useImperativeHanle to achieve our goal.
 https://ilxanlar.medium.com/react-forwardref-in-two-minutes-2f33071c72fa
 https://segmentfault.com/a/1190000040758640
+there is still a problem,if you want to get a child component's children of its props,you should not pass the props.children in the ref,cause its type is Reactnode,you can't get a htmlelement's attribute from a reactnode or reactelement.So you need to pass ref.current.children,which is a htmlcollection,so you can get all the htmlelement's attribute from it.Just take a look at WyPlayerPanel(parent component) and WyScroll(child component),you can see how I implement the above.
+(这个地方的场景就是，wyplayerpanel 里面的歌单列表需要可以滑动，可以用 better-scroll 来实现，首先用 better-scroll 写一个 Wyscroll 组件，wyplayerpanel 组件引入 wyscroll，然后用 wyscroll 包裹需要滑动的部分，这部分就是 wyscroll 的 props 中的 children,这部分是一个 ul，里面有若干 li，如果 wyplayerpanel 可以显示六首歌，而这个列表中有十首歌，那么，当切到第七首时，需要调用 scrolltoelement 将第七首滑动到可视区域，这时候操作这个方法需要到 wyplayerpanel 里面进行操作更为合理，具体可以看代码)
 
 still need to work:
 1.the styles of header at home page.
