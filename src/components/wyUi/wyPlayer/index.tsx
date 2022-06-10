@@ -4,7 +4,7 @@ import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayList, setPlayMode } from "../../../redux/playerSlice";
 import { PlayMode, Song } from "../../../types/GlobalTypes";
-import { shuffle } from "../../../utils/array";
+import { findIndex, shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
 import WyPlayerPanel from "./wyPlayerPanel";
@@ -106,7 +106,8 @@ export default function WyPlayer() {
   }
 
   const updateCurrentIndex = (list: Song[], song: Song) => {
-    const newIndex = list.findIndex(item => item.id === song.id)
+    //const newIndex = list.findIndex(item => item.id === song.id)
+    const newIndex = findIndex(list, song)
     dispatch(setCurrentIndex({ currentIndex: newIndex }))
   }
 
@@ -262,7 +263,7 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
-          <WyPlayerPanel songList={songList} currentSong={currentSong} currentIndex={currentIndex} show={showListPane} onChangeSong={onChangeSong} />
+          <WyPlayerPanel songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
         </div>
       </div>
 

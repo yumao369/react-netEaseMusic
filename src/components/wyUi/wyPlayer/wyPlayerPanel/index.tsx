@@ -1,13 +1,14 @@
 import React, { ReactElement, RefObject, useEffect, useRef, useState } from "react";
 import { formatTime } from "../../../../functions/formatTime";
+import { setCurrentIndex } from "../../../../redux/playerSlice";
 import { Singer, Song } from "../../../../types/GlobalTypes";
+import { findIndex } from "../../../../utils/array";
 import styles from "./index.module.less"
 import WyScroll, { WyScrollRef } from "./scroll";
 
 interface WyPlayerPanelProps {
   songList: Song[];
   currentSong: Song;
-  currentIndex: number;
   show: boolean;
   onChangeSong: (song: Song) => void
 }
@@ -15,6 +16,7 @@ interface WyPlayerPanelProps {
 export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
+  const [currentIndex, setCurrentIndex] = useState<number>(-1)
   const songListRef = useRef<WyScrollRef | null>(null)
 
   useEffect(() => {
@@ -30,7 +32,11 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     if (props.show) {
       scrollToCurrent()
     }
-  }, [props.currentIndex])
+  }, [currentIndex])
+
+  useEffect(() => {
+    refreshCurrentIndex()
+  }, [props.currentSong])
 
   useEffect(() => {
     console.log('scrollEndHeight', scrollEndHeight)
@@ -50,12 +56,17 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
   }
 
   const scrollToCurrent = () => {
-    const currentLi = songListRef.current?.children?.item(props.currentIndex) as HTMLElement
+    const currentLi = songListRef.current?.children?.item(currentIndex) as HTMLElement
     const offsetTop = currentLi.offsetTop
     const offsetHeight = currentLi.offsetHeight
     if (((offsetTop - Math.abs(scrollEndHeight)) > offsetHeight * 5 || (offsetTop < Math.abs(scrollEndHeight)))) {
       songListRef.current?.scrollToElement(currentLi, 300, false, false)
     }
+  }
+
+  const refreshCurrentIndex = () => {
+    const index = findIndex(props.songList, props.currentSong)
+    setCurrentIndex(index)
   }
 
   const renderSongSinger = (singers: Singer[]) => {
@@ -80,7 +91,7 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
       return (
         <li
           key={item.id}
-          className={props.currentIndex === index ? styles.current : ''}
+          className={currentIndex === index ? styles.current : ''}
           onClick={() => props.onChangeSong(item)}
         >
           <i className={[styles.col, styles.arrow].join(' ')}></i>
