@@ -32,6 +32,11 @@ export type Song = {
   dt: number;
 };
 
+export type Lyric = {
+  lyric: string;
+  tlyric: string
+}
+
 export type SongSheet = {
   id: number;
   name: string;

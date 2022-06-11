@@ -12,8 +12,8 @@ BScroll.use(ScrollBar);
 
 interface WyScrollProps {
   children: React.ReactNode;
-  data: Song[];
-  getScrollEndHeight: (y: number) => void
+  data?: Song[];
+  getScrollEndHeight?: (y: number) => void
 }
 
 export interface WyScrollRef {
@@ -73,7 +73,7 @@ const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, r
   }
 
   const listenScrollEnd = () => {
-    bs?.on('scrollEnd', ({ y }: { y: number }) => props.getScrollEndHeight(y))
+    bs?.on('scrollEnd', ({ y }: { y: number }) => props.getScrollEndHeight?.(y))
   }
 
   const scrollToElement = (el: HTMLElement, time: number, offsetX: number | boolean, offsetY: number | boolean) => {

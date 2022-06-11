@@ -245,7 +245,7 @@
     }
   }
 
-  .list-lyric {
+  .listLyric {
     position: absolute;
     right: 2px;
     top: 0;
@@ -253,8 +253,10 @@
     margin: 21px 0 20px 0;
     height: 219px;
     width: 414px;
+    overflow: hidden;
     ul {
       li {
+        list-style: none;
         color: @prev-color;
         word-wrap: break-word;
         text-align: center;
@@ -262,7 +264,7 @@
         //height: 32px;
         transition: color 0.3s;
         font-size: @font-size-sm;
-        &.current {
+        .currentLyric {
           color: @white-color;
         }
       }

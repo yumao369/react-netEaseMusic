@@ -1,9 +1,12 @@
 import React, { ReactElement, RefObject, useEffect, useRef, useState } from "react";
+import { async } from "rxjs/internal/scheduler/async";
 import { formatTime } from "../../../../functions/formatTime";
 import { setCurrentIndex } from "../../../../redux/playerSlice";
+import { getLyric } from "../../../../services/song.service";
 import { Singer, Song } from "../../../../types/GlobalTypes";
 import { findIndex } from "../../../../utils/array";
 import styles from "./index.module.less"
+import { BaseLyricLine, WyLyric } from "./lyric";
 import WyScroll, { WyScrollRef } from "./scroll";
 
 interface WyPlayerPanelProps {
@@ -17,7 +20,10 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
+  const [currentLyric, setCurrentLyric] = useState<BaseLyricLine[]>([])
+  const [currentLineNum, setCurrentLineNum] = useState<number>(0)
   const songListRef = useRef<WyScrollRef | null>(null)
+  const lyricListRef = useRef<WyScrollRef | null>(null)
 
   useEffect(() => {
     refreshScroll()
@@ -42,12 +48,19 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     console.log('scrollEndHeight', scrollEndHeight)
   }, [scrollEndHeight])
 
+  useEffect(() => {
+    if (props.currentSong) {
+      updateLyric()
+    }
+  }, [props.currentSong])
+
   const refreshScroll = () => {
     if (props.show) {
       //console.log('currentSongOffsetHeight', ((songListRef.current?.children as ReactElement).props.children[props.currentIndex] as HTMLElement).offsetHeight)
       //console.log('currentSongOffsetHeight', (songListRef.current?.children?.item(0)?.children.item(props.currentIndex) as HTMLElement).offsetTop)
       //console.log('currentSongOffsetHeight', (songListRef.current?.children?.item(props.currentIndex) as HTMLElement).offsetTop)
       songListRef.current?.refreshScroll()
+      lyricListRef.current?.refreshScroll()
     }
   }
 
@@ -67,6 +80,18 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
   const refreshCurrentIndex = () => {
     const index = findIndex(props.songList, props.currentSong)
     setCurrentIndex(index)
+  }
+
+  const updateLyric = async () => {
+    const res = await getLyric(props.currentSong.id)
+    const lyric = new WyLyric(res)
+    console.log('xxxxxxx')
+    lyric.handler.subscribe(({ lineNum }) => {
+      console.log('lineNum', lineNum)
+      setCurrentLineNum(lineNum)
+    })
+    console.log('yyyyyyyy')
+    setCurrentLyric(lyric.lines)
   }
 
   const renderSongSinger = (singers: Singer[]) => {
@@ -113,6 +138,16 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     })
   }
 
+  const renderLyric = () => {
+    return currentLyric.map((item, index) => {
+      return (
+        <li className={currentLineNum === index ? styles.currentLyric : ''}>
+          {item.txt}<br />{item.txtCn}
+        </li>
+      )
+    })
+  }
+
   return (
     <div className={[styles.playPanel, props.show ? styles.show : ""].join(' ')}>
       <div className={styles.hd}>
@@ -142,38 +177,13 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
             </ul >
           </WyScroll>
         </div >
-        <ul>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-          <li>
-            中文 <br /> 英文
-          </li>
-        </ul>
+        <div className={styles.listLyric}>
+          <WyScroll ref={lyricListRef}>
+            <ul>
+              {renderLyric()}
+            </ul>
+          </WyScroll>
+        </div>
       </div >
     </div >
   )

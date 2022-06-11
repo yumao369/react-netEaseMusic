@@ -1,5 +1,6 @@
-import { Song, SongUrl } from "../types/GlobalTypes";
+import { Lyric, Song, SongUrl } from "../types/GlobalTypes";
 import { API } from "../utils/api";
+import { get } from "../utils/requestUtils";
 
 export const getSongUrl = async (ids: string): Promise<SongUrl[]> => {
   const params = { id: ids };
@@ -26,3 +27,17 @@ const generateSongList = (songs: Song[], urls: SongUrl[]): Song[] => {
   });
   return result;
 };
+
+export const getLyric = async (id: number): Promise<Lyric> => {
+  const params = { id: id }
+  const res = await API.get("lyric", { params })
+  const { data } = res
+  return {
+    lyric: data.lrc.lyric,
+    tlyric: data.tlyric.lyric
+  }
+}
+
+/*export const getLyric = <T>(id: number) => {
+  return get<T>("lyric", { id: id })
+}*/
