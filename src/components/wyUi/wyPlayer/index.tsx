@@ -263,7 +263,7 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
-          <WyPlayerPanel songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
+          <WyPlayerPanel playing={playing} songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
         </div>
       </div>
 

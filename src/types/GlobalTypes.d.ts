@@ -34,6 +34,7 @@ export type Song = {
 
 export type Lyric = {
   lyric: string;
+  //translated lyric(normally refers to chinese translation of other language version)
   tlyric: string
 }
 

@@ -10,6 +10,7 @@ import { BaseLyricLine, WyLyric } from "./lyric";
 import WyScroll, { WyScrollRef } from "./scroll";
 
 interface WyPlayerPanelProps {
+  playing: boolean;
   songList: Song[];
   currentSong: Song;
   show: boolean;
@@ -20,8 +21,10 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
 
   const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
+  const [lyric, setLyric] = useState<WyLyric | null>(null)
   const [currentLyric, setCurrentLyric] = useState<BaseLyricLine[]>([])
   const [currentLineNum, setCurrentLineNum] = useState<number>(0)
+  const [lyricRefs, setLyricRefs] = useState<null>(null)
   const songListRef = useRef<WyScrollRef | null>(null)
   const lyricListRef = useRef<WyScrollRef | null>(null)
 
@@ -54,6 +57,22 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     }
   }, [props.currentSong])
 
+  useEffect(() => {
+    lyric?.handler.subscribe(({ lineNum }) => {
+      console.log('lineNum:', lineNum)
+      setCurrentLineNum(lineNum)
+    })
+    handleLyric()
+    return (() => {
+      lyric?.handler.unsubscribe()
+    })
+  }, [lyric])
+
+  useEffect(() => {
+    console.log('props.playing', props.playing)
+    lyric?.togglePlay(props.playing)
+  }, [props.playing])
+
   const refreshScroll = () => {
     if (props.show) {
       //console.log('currentSongOffsetHeight', ((songListRef.current?.children as ReactElement).props.children[props.currentIndex] as HTMLElement).offsetHeight)
@@ -85,13 +104,23 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
   const updateLyric = async () => {
     const res = await getLyric(props.currentSong.id)
     const lyric = new WyLyric(res)
+    setLyric(lyric)
+    /*console.log('lyric', lyric)
     console.log('xxxxxxx')
     lyric.handler.subscribe(({ lineNum }) => {
       console.log('lineNum', lineNum)
       setCurrentLineNum(lineNum)
     })
-    console.log('yyyyyyyy')
-    setCurrentLyric(lyric.lines)
+    console.log('yyyyyyyy')*/
+    //setCurrentLyric(lyric.lines)
+  }
+
+  const handleLyric = () => {
+    setCurrentLyric(lyric?.lines ?? [])
+  }
+
+  const resetLyric = () => {
+    lyric?.stop()
   }
 
   const renderSongSinger = (singers: Singer[]) => {

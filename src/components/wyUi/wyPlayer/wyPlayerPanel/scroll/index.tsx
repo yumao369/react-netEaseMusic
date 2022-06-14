@@ -21,6 +21,7 @@ export interface WyScrollRef {
   //children:ReactNode;
   children: HTMLCollection | undefined;
   scrollToElement: (el: HTMLElement, time: number, offsetX: number | boolean, offsetY: number | boolean) => void
+  scrollTo: (x: number, y: number) => void
 }
 
 const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, ref) => {
@@ -48,7 +49,8 @@ const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, r
     //children: props.children
     //children: wrapRef.current?.children
     children: wrapRef.current?.children.item(0)?.children,
-    scrollToElement: scrollToElement
+    scrollToElement: scrollToElement,
+    scrollTo: scrollTo
   }))
 
   const initBS = () => {
@@ -78,6 +80,10 @@ const WyScroll: ForwardRefRenderFunction<WyScrollRef, WyScrollProps> = (props, r
 
   const scrollToElement = (el: HTMLElement, time: number, offsetX: number | boolean, offsetY: number | boolean) => {
     bs?.scrollToElement(el, time, offsetX, offsetY)
+  }
+
+  const scrollTo = (x: number, y: number) => {
+    bs?.scrollTo(x, y)
   }
 
   return (
