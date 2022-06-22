@@ -1,4 +1,4 @@
-import React, { ReactElement, RefObject, useEffect, useRef, useState } from "react";
+import React, { forwardRef, ForwardRefRenderFunction, ReactElement, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { async } from "rxjs/internal/scheduler/async";
 import { formatTime } from "../../../../functions/formatTime";
 import { setCurrentIndex } from "../../../../redux/playerSlice";
@@ -17,7 +17,11 @@ interface WyPlayerPanelProps {
   onChangeSong: (song: Song) => void
 }
 
-export default function WyPlayerPanel(props: WyPlayerPanelProps) {
+export interface WyPlayerPanelRef {
+  seekLyric: (time: number) => void
+}
+
+const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelProps> = (props, ref) => {
 
   const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
@@ -84,6 +88,10 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
       lyric?.handler.unsubscribe()
     })
   }, [lyric])
+
+  useImperativeHandle(ref, () => ({
+    seekLyric: seekLyric
+  }))
 
 
   const refreshScroll = () => {
@@ -242,3 +250,5 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     </div >
   )
 }
+
+export default forwardRef(WyPlayerPanel)

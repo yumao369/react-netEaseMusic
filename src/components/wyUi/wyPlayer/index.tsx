@@ -7,7 +7,7 @@ import { PlayMode, Song } from "../../../types/GlobalTypes";
 import { findIndex, shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
-import WyPlayerPanel from "./wyPlayerPanel";
+import WyPlayerPanel, { WyPlayerPanelRef } from "./wyPlayerPanel";
 
 const modeTypes: PlayMode[] = [
   {
@@ -39,6 +39,7 @@ export default function WyPlayer() {
   const [showVolPanel, setShowVolPanel] = useState(false)
   const [showListPane, setShowListPanel] = useState(false)
   const [selfClick, setSelfClick] = useState(false)
+  const wyPlayerPanelRef = useRef<WyPlayerPanelRef | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -115,6 +116,7 @@ export default function WyPlayer() {
     if (currentSong) {
       //@ts-ignore
       audioRef.current.currentTime = (currentSong?.dt / 1000) * (per / 100)
+      wyPlayerPanelRef.current?.seekLyric((currentSong?.dt / 1000) * (per / 100) * 1000)
     }
   }
 
@@ -195,6 +197,7 @@ export default function WyPlayer() {
     //@ts-ignore
     audioRef.current.currentTime = 0
     audioRef.current?.play()
+    wyPlayerPanelRef.current?.seekLyric(0)
   }
 
   const onChangeSong = (song: Song) => {
@@ -263,7 +266,7 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
-          <WyPlayerPanel playing={playing} songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
+          <WyPlayerPanel ref={wyPlayerPanelRef} playing={playing} songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
         </div>
       </div>
 

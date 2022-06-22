@@ -140,7 +140,6 @@ export class WyLyric {
     let line = this.lines[this.curNum];
     const delay = line.time - (Date.now() - this.startStamp);
     this.timer$ = timer(delay).subscribe(() => {
-      console.log('ggggggggggggggggggggggg')
       this.callHandler(this.curNum++);
       if (this.curNum < this.lines.length && this.playing) {
         this.playReset();
@@ -161,7 +160,6 @@ export class WyLyric {
 
   private callHandler(i: number) {
     if (i > 0) {
-      console.log('tttttttttttttttttttttttttttttttt')
       this.handler.next({
         txt: this.lines[i].txt,
         txtCn: this.lines[i].txtCn,
