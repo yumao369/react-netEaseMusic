@@ -1,6 +1,6 @@
 import { Lyric } from '../../../../types/GlobalTypes';
 import { findIndex } from '../../../../utils/array';
-import { from, zip, Subject } from 'rxjs';
+import { from, zip, Subject, Subscription, timer } from 'rxjs';
 import { skip } from 'rxjs/internal/operators';
 // [00:34.940]
 const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
@@ -27,13 +27,14 @@ export class WyLyric {
 
   private playing = false;
 
+  //add ! to not init the value
   private curNum!: number;
   private startStamp!: number;
   private pauseStamp!: number;
 
   handler = new Subject<Handler>();
 
-  private timer: any;
+  private timer$!: Subscription;
 
   constructor(lrc: Lyric) {
     this.lrc = lrc;
@@ -115,19 +116,21 @@ export class WyLyric {
     }
   }
 
-  play(startTime = 0) {
+  play(startTime = 0, skip = false) {
     if (!this.lines.length) return;
     if (!this.playing) {
       this.playing = true;
     }
 
     this.curNum = this.findCurNum(startTime);
-    console.log('curNum :', this.curNum);
     this.startStamp = Date.now() - startTime;
-    // this.callHandler()
+    if (!skip) {
+      this.callHandler(this.curNum - 1);
+    }
 
     if (this.curNum < this.lines.length) {
-      clearTimeout(this.timer);
+      console.log()
+      this.clearTimer();
       this.playReset();
     }
 
@@ -136,21 +139,35 @@ export class WyLyric {
   private playReset() {
     let line = this.lines[this.curNum];
     const delay = line.time - (Date.now() - this.startStamp);
-    this.timer = setTimeout(() => {
+    this.timer$ = timer(delay).subscribe(() => {
+      console.log('ggggggggggggggggggggggg')
       this.callHandler(this.curNum++);
       if (this.curNum < this.lines.length && this.playing) {
         this.playReset();
       }
-    }, delay);
+    });
+    /*  this.timer$ = setTimeout(() => {
+       this.callHandler(this.curNum++);
+       if (this.curNum < this.lines.length && this.playing) {
+         this.playReset();
+       }
+     }, delay); */
+  }
+
+  private clearTimer() {
+    this.timer$ && this.timer$.unsubscribe();
   }
 
 
   private callHandler(i: number) {
-    this.handler.next({
-      txt: this.lines[i].txt,
-      txtCn: this.lines[i].txtCn,
-      lineNum: i
-    });
+    if (i > 0) {
+      console.log('tttttttttttttttttttttttttttttttt')
+      this.handler.next({
+        txt: this.lines[i].txt,
+        txtCn: this.lines[i].txtCn,
+        lineNum: i
+      });
+    }
   }
 
 
@@ -164,7 +181,7 @@ export class WyLyric {
     this.playing = playing;
     if (playing) {
       const startTime = (this.pauseStamp || now) - (this.startStamp || now);
-      this.play(startTime);
+      this.play(startTime, true);
     } else {
       this.stop();
       this.pauseStamp = now;
@@ -175,6 +192,10 @@ export class WyLyric {
     if (this.playing) {
       this.playing = false;
     }
-    clearTimeout(this.timer);
+    this.clearTimer();
+  }
+
+  seek(time: number) {
+    this.play(time);
   }
 }

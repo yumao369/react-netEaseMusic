@@ -59,11 +59,16 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
   }, [props.currentSong])
 
   useEffect(() => {
+    lyric?.togglePlay(props.playing)
+  }, [props.playing])
+
+  useEffect(() => {
+    lyricListRef.current?.refreshScroll()
     setCurrentLyric(lyric?.lines ?? [])
     lyric?.handler.subscribe(({ lineNum }) => {
       //const lyricLength = lyricListRef.current?.children?.length
       //console.log('lyricLength', lyricLength)
-      console.log('lineNum:', lineNum)
+      //console.log('lineNum:', lineNum)
       setCurrentLineNum(lineNum)
       if (lineNum > startLine) {
         const targetLine = lyricListRef.current?.children?.item(lineNum - startLine) as HTMLElement
@@ -74,17 +79,12 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
         }
       }
     })
-    handleLyric(startLine)
+    handleLyric()
     return (() => {
-      console.log('wwwwwwwwwwwwwwwwwww')
       lyric?.handler.unsubscribe()
     })
   }, [lyric])
 
-  useEffect(() => {
-    console.log('props.playing', props.playing)
-    lyric?.togglePlay(props.playing)
-  }, [props.playing])
 
   const refreshScroll = () => {
     if (props.show) {
@@ -130,11 +130,11 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     //setCurrentLyric(lyric.lines)
   }
 
-  const handleLyric = (startLine: number) => {
-    //setCurrentLyric(lyric?.lines ?? [])
-    console.log('lyric', lyric)
-
-
+  const handleLyric = () => {
+    lyricListRef.current?.scrollTo(0, 0)
+    if (props.playing) {
+      lyric?.play()
+    }
   }
 
   const resetLyric = () => {
@@ -142,6 +142,10 @@ export default function WyPlayerPanel(props: WyPlayerPanelProps) {
     setLyric(null)
     setCurrentLyric([])
     setCurrentLineNum(0)
+  }
+
+  const seekLyric = (time: number) => {
+    lyric?.seek(time)
   }
 
   const renderSongSinger = (singers: Singer[]) => {
