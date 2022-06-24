@@ -1,7 +1,8 @@
 import React, { forwardRef, ForwardRefRenderFunction, ReactElement, RefObject, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { async } from "rxjs/internal/scheduler/async";
 import { formatTime } from "../../../../functions/formatTime";
-import { setCurrentIndex } from "../../../../redux/playerSlice";
+import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
+import { selectCurrentIndex, setCurrentIndex } from "../../../../redux/playerSlice";
 import { getLyric } from "../../../../services/song.service";
 import { Singer, Song } from "../../../../types/GlobalTypes";
 import { findIndex } from "../../../../utils/array";
@@ -14,7 +15,10 @@ interface WyPlayerPanelProps {
   songList: Song[];
   currentSong: Song;
   show: boolean;
-  onChangeSong: (song: Song) => void
+  onChangeSong: (song: Song) => void;
+  onClose: () => void;
+  onDeleteSong: (song: Song) => void;
+  onClearSong: () => void;
 }
 
 export interface WyPlayerPanelRef {
@@ -24,13 +28,17 @@ export interface WyPlayerPanelRef {
 const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelProps> = (props, ref) => {
 
   const [scrollEndHeight, setScrollEndHeight] = useState<number>(0)
-  const [currentIndex, setCurrentIndex] = useState<number>(-1)
+  //const [currentIndex, setCurrentIndex] = useState<number>(-1)
   const [lyric, setLyric] = useState<WyLyric | null>(null)
   const [currentLyric, setCurrentLyric] = useState<BaseLyricLine[]>([])
   const [currentLineNum, setCurrentLineNum] = useState<number>(0)
   const [startLine, setStartLine] = useState<number>(2)
   const songListRef = useRef<WyScrollRef | null>(null)
   const lyricListRef = useRef<WyScrollRef | null>(null)
+
+  const dispatch = useAppDispatch()
+
+  const currentIndex = useAppSelector(selectCurrentIndex)
 
   useEffect(() => {
     refreshScroll()
@@ -110,8 +118,8 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
 
   const scrollToCurrent = () => {
     const currentLi = songListRef.current?.children?.item(currentIndex) as HTMLElement
-    const offsetTop = currentLi.offsetTop
-    const offsetHeight = currentLi.offsetHeight
+    const offsetTop = currentLi?.offsetTop
+    const offsetHeight = currentLi?.offsetHeight
     if (((offsetTop - Math.abs(scrollEndHeight)) > offsetHeight * 5 || (offsetTop < Math.abs(scrollEndHeight)))) {
       songListRef.current?.scrollToElement(currentLi, 300, false, false)
     }
@@ -119,7 +127,8 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
 
   const refreshCurrentIndex = () => {
     const index = findIndex(props.songList, props.currentSong)
-    setCurrentIndex(index)
+    //setCurrentIndex(index)
+    dispatch(setCurrentIndex({ currentIndex: index }))
   }
 
   const updateLyric = async () => {
@@ -156,6 +165,16 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
     lyric?.seek(time)
   }
 
+  const handleOnClickDeleteSong = (e: React.MouseEvent, song: Song) => {
+    e.stopPropagation()
+    props.onDeleteSong(song)
+  }
+
+  const handleOnClickClearSong = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    props.onClearSong()
+  }
+
   const renderSongSinger = (singers: Singer[]) => {
     const singerNum = singers.length
     return singers.map((item, index) => {
@@ -186,7 +205,7 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
           <div className={[styles.col, styles.icons].join(' ')}>
             <i className={[styles.ico, styles.like].join(' ')} title="收藏"></i>
             <i className={[styles.ico, styles.share].join(' ')} title="分享"></i>
-            <i className={[styles.ico, styles.trush].join(' ')} title="删除"></i>
+            <i className={[styles.ico, styles.trush].join(' ')} title="删除" onClick={(e) => { handleOnClickDeleteSong(e, item) }}></i>
           </div>
           <div className={[styles.singers, styles.clearfix, styles.ellipsis].join(' ')} key={item.id}>
             <div className={styles.anima}>
@@ -219,11 +238,11 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
             <i className={styles.icon} title="收藏全部"></i>收藏全部
           </div>
           <span className={styles.line}></span>
-          <div className={styles.clearAll}>
-            <i className={[styles.icon, styles.trush].join(' ')} title="清除"></i>清除
+          <div className={styles.clearAll} onClick={handleOnClickClearSong}>
+            <i className={[styles.icon, styles.trush].join(' ')} title="清除" ></i>清除
           </div>
           <p className={styles.playingName}>{props.currentSong?.name}</p>
-          <i className={[styles.icon, styles.close].join(' ')} ></i>
+          <i className={[styles.icon, styles.close].join(' ')} onClick={props.onClose}></i>
         </div>
       </div >
 

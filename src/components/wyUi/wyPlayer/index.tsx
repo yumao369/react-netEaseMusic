@@ -1,8 +1,9 @@
+import { Modal } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { fromEvent, Subscription } from "rxjs";
 import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayList, setPlayMode } from "../../../redux/playerSlice";
+import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayList, setPlayMode, setSongList } from "../../../redux/playerSlice";
 import { PlayMode, Song } from "../../../types/GlobalTypes";
 import { findIndex, shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
@@ -32,6 +33,7 @@ export default function WyPlayer() {
   const doc = document
 
   const audioRef = useRef<HTMLAudioElement>(null)
+  const wyPlayerPanelRef = useRef<WyPlayerPanelRef | null>(null)
   const [currentTime, setCurrentTime] = useState(initDuration)
   const [playOffset, setPlayOffset] = useState(0)
   const [songReady, setSongReady] = useState(false)
@@ -39,7 +41,6 @@ export default function WyPlayer() {
   const [showVolPanel, setShowVolPanel] = useState(false)
   const [showListPane, setShowListPanel] = useState(false)
   const [selfClick, setSelfClick] = useState(false)
-  const wyPlayerPanelRef = useRef<WyPlayerPanelRef | null>(null)
 
   const dispatch = useAppDispatch()
 
@@ -204,6 +205,39 @@ export default function WyPlayer() {
     updateCurrentIndex(playList, song)
   }
 
+  const onCloseListPanel = () => {
+    setShowListPanel(false)
+  }
+
+  //delete one song in a list
+  const onDeleteSong = (song: Song) => {
+    const songListCopy = songList.slice()
+    const playListCopy = playList.slice()
+    let currentIndexCopy = currentIndex
+    const sIndex = findIndex(songListCopy, song)
+    songListCopy.splice(sIndex, 1)
+    const pIndex = findIndex(playListCopy, song)
+    playListCopy.splice(pIndex, 1)
+    if (currentIndexCopy > pIndex || currentIndexCopy === playListCopy.length) {
+      currentIndexCopy--
+    }
+    dispatch(setSongList({ songList: songListCopy }))
+    dispatch(setPlayList({ playList: playListCopy }))
+    dispatch(setCurrentIndex({ currentIndex: currentIndexCopy }))
+  }
+
+  //clear all songs in a list
+  const onClearSong = () => {
+    Modal.confirm({
+      title: '确认清空列表？',
+      onOk: () => {
+        dispatch(setSongList({ songList: [] }))
+        dispatch(setPlayList({ playList: [] }))
+        dispatch(setCurrentIndex({ currentIndex: -1 }))
+      }
+    })
+  }
+
   const renderAuthor = () => {
     const length = currentSong?.ar.length
     return currentSong?.ar.map((item, index) => {
@@ -266,7 +300,16 @@ export default function WyPlayer() {
               <WySlider wyVertical={true} drag={onVolumeChange} />
             </div>
           </div>
-          <WyPlayerPanel ref={wyPlayerPanelRef} playing={playing} songList={songList} currentSong={currentSong} show={showListPane} onChangeSong={onChangeSong} />
+          <WyPlayerPanel
+            ref={wyPlayerPanelRef}
+            playing={playing}
+            songList={songList}
+            currentSong={currentSong}
+            show={showListPane}
+            onChangeSong={onChangeSong}
+            onClose={onCloseListPanel}
+            onDeleteSong={onDeleteSong}
+            onClearSong={onClearSong} />
         </div>
       </div>
 
