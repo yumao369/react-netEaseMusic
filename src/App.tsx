@@ -1,10 +1,12 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, useHistory, Link } from "react-router-dom";
 import { Layout, Menu, Input } from "antd";
 import { MobileOutlined, UserAddOutlined } from "@ant-design/icons";
 import Home from "./pages/home";
 import styles from "./App.module.less";
 import WyPlayer from "./components/wyUi/wyPlayer";
+import Sheet from "./pages/sheetList";
+import SheetInfo from "./pages/sheetInfo";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -22,9 +24,20 @@ const menu = [
 ];
 
 function App() {
+  /*const history = useHistory()
+
+  const handleRouteJump = (path: string) => {
+    console.log('history', history)
+    history.push({
+      pathname: path
+    })
+  }*/
+
   const renderMenuItem = () => {
     return menu.map((item, index) => {
-      return <Menu.Item key={index}>{item.label}</Menu.Item>;
+      return <Menu.Item key={index} >
+        <Link to={{ pathname: `${item.path}` }}>{item.label}</Link>
+      </Menu.Item>;
     });
   };
 
@@ -70,6 +83,8 @@ function App() {
               render={() => <Redirect to="/home" />}
             ></Route>
             <Route path="/home" component={Home} />
+            <Route path="/sheet" component={Sheet} />
+            <Route path="/sheetInfo/:id" component={SheetInfo} />
           </Content>
           <Footer className={styles.footer}>
             Ant Design ©2022 Implement By React

@@ -33,8 +33,8 @@ export const getLyric = async (id: number): Promise<Lyric> => {
   const res = await API.get("lyric", { params })
   const { data } = res
   return {
-    lyric: data.lrc?.lyric,
-    tlyric: data.tlyric?.lyric
+    lyric: data.lrc?.lyric ?? '',
+    tlyric: data.tlyric?.lyric ?? ''
   }
 }
 

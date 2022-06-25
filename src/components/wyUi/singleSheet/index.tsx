@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { playsheet } from "../../../services/sheet.service";
 import { SongSheet } from "../../../types/GlobalTypes";
 import styles from "./index.module.less";
@@ -6,9 +7,12 @@ import styles from "./index.module.less";
 interface SingleSheetProps {
   sheet: SongSheet;
   onPlay: (id: number) => void;
+  className?: string
 }
 
 export default function SingleSheet(props: SingleSheetProps) {
+  const history = useHistory()
+
   const playCountFormatter = (value: number): number | string => {
     if (value > 10000) {
       return Math.floor(value / 10000) + "万";
@@ -17,16 +21,22 @@ export default function SingleSheet(props: SingleSheetProps) {
     }
   };
 
+  const handleRouteJump = (id: number) => {
+    history.push(`/sheetInfo/${id}`)
+  }
+
   const playSheet = async (id: number) => {
     props.onPlay(id);
   };
 
+  const coverImg = props.sheet.picUrl || props.sheet.coverImgUrl
+
   return (
-    <div className={styles.sheetItem}>
+    <div className={[styles.sheetItem, props.className ? props.className : ''].join(' ')} onClick={() => { handleRouteJump(props.sheet.id) }}>
       <a className={styles.cover}>
         <img
           className={styles.img}
-          src={props.sheet.picUrl}
+          src={coverImg}
           alt={props.sheet.name}
         />
         <div className={styles.bottom}>

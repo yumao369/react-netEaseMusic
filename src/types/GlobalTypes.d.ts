@@ -40,9 +40,19 @@ export type Lyric = {
 
 export type SongSheet = {
   id: number;
+  userId: number;
   name: string;
   picUrl: string;
+  coverImgUrl: string;
   playCount: number;
+  tags: string[];
+  createTime: number;
+  creator: { nickname: string; avatarUrl: string; };
+  description: string;
+  subscribedCount: number;
+  shareCount: number;
+  commentCount: number;
+  subscribed: boolean;
   tracks: Song[];
 };
 
@@ -71,3 +81,15 @@ export type PlayMode = {
   type: "loop" | "random" | "singleLoop";
   label: "循环" | "随机" | "单曲循环";
 };
+
+export type SheetParams = {
+  offset: number;
+  limit: number;
+  order: 'new' | 'hot';
+  cat: string;
+}
+
+export type SheetList = {
+  playlists: SongSheet[];
+  total: number;
+}

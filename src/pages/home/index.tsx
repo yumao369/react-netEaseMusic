@@ -23,6 +23,7 @@ import {
   setSongList,
 } from "../../redux/playerSlice";
 import { playsheet } from "../../services/sheet.service";
+import { useHistory } from "react-router-dom";
 
 export default function Home() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -30,6 +31,7 @@ export default function Home() {
   const [songSheetList, setSongSheetList] = useState<SongSheet[]>([]);
   const [settledSinger, setSettledSinger] = useState<Singer[]>([]);
   const carouselRef = useRef<CarouselRef | null>(null);
+  const history = useHistory()
 
   const dispatch = useAppDispatch();
 
@@ -100,6 +102,13 @@ export default function Home() {
     dispatch(setCurrentIndex({ currentIndex: 0 }));
   };
 
+  const handleRouteJump = (name: string) => {
+    history.push({
+      pathname: '/sheet',
+      search: `?cat=${name}`
+    })
+  }
+
   const renderCarouselItem = () => {
     return banners.map((item, index) => {
       return (
@@ -115,7 +124,7 @@ export default function Home() {
   const renderHotTags = () => {
     return hotTags.map((item, index) => {
       return (
-        <a className={styles.hotTagItem} key={index}>
+        <a className={styles.hotTagItem} key={index} onClick={() => { handleRouteJump(item.name) }} >
           {item.name}
         </a>
       );

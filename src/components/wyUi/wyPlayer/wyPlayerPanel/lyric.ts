@@ -2,8 +2,14 @@ import { Lyric } from '../../../../types/GlobalTypes';
 import { findIndex } from '../../../../utils/array';
 import { from, zip, Subject, Subscription, timer } from 'rxjs';
 import { skip } from 'rxjs/internal/operators';
-// [00:34.940]
-const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+/**
+ * use the website below to better develope exp
+ * https://regexper.com/
+ */
+// [00:34.940]  [00:34]
+// const timeExp = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+// const timeExp = /\[(\d{2}):(\d{2})(\.\d{2,3})?\]/;
+const timeExp = /\[(\d{2}):(\d{2})(?:\.(\d{2,3}))?\]/;
 
 
 export interface BaseLyricLine {
