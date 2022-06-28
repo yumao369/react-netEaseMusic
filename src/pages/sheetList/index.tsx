@@ -50,7 +50,7 @@ export default function Sheet() {
   const renderSheets = () => {
     return sheets?.playlists.map(item => {
       return (
-        <SingleSheet className={styles.sheetItem} sheet={item} onPlay={onPlaySheet} />
+        <SingleSheet className={styles.sheetItem} sheet={item} onPlay={onPlaySheet} key={item.id} />
       )
     })
   }

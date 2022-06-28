@@ -1,7 +1,9 @@
 import { playsheet } from "./sheet.service";
 import store from "../redux/store";
-import { useAppDispatch } from "../redux/hooks";
-import { setCurrentIndex, setPlayList, setSongList } from "../redux/playerSlice"
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { selectSongList, setCurrentIndex, setPlayList, setSongList } from "../redux/playerSlice"
+import { Song } from "../types/GlobalTypes";
+import { findIndex } from "../utils/array";
 
 /**
  * optimize
@@ -18,4 +20,41 @@ export const onPlaySheetBatch = async (id: number) => {
   store.dispatch(setSongList({ songList: list }));
   store.dispatch(setPlayList({ playList: list }));
   store.dispatch(setCurrentIndex({ currentIndex: 0 }));
+}
+
+export const insertSong = (song: Song, isPlay: boolean) => {
+  const songList = store.getState().playReducer.songList.slice()
+  const playList = store.getState().playReducer.playList.slice()
+  let insertIndex = store.getState().playReducer.currentIndex
+  const pIndex = findIndex(playList, song)
+  if (pIndex > -1) {
+    if (isPlay) {
+      insertIndex = pIndex
+    }
+  } else {
+    songList.push(song)
+    playList.push(song)
+    if (isPlay) {
+      insertIndex = songList.length - 1
+    }
+    store.dispatch(setSongList({ songList: songList }))
+    store.dispatch(setPlayList({ playList: playList }))
+  }
+  if (insertIndex !== store.getState().playReducer.currentIndex) {
+    store.dispatch(setCurrentIndex({ currentIndex: insertIndex }))
+  }
+}
+
+export const insertSongs = (songs: Song[]) => {
+  const songList = store.getState().playReducer.songList.slice()
+  const playList = store.getState().playReducer.playList.slice()
+  songs.forEach(item => {
+    const pIndex = findIndex(playList, item)
+    if (pIndex === -1) {
+      songList.push(item)
+      playList.push(item)
+    }
+  })
+  store.dispatch(setSongList({ songList: songList }))
+  store.dispatch(setPlayList({ playList: playList }))
 }

@@ -179,7 +179,7 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
     const singerNum = singers.length
     return singers.map((item, index) => {
       return (
-        <div className={styles.singerItem} >
+        <div className={styles.singerItem} key={item.id}>
           <a className={[styles.col, styles.ellipsis].join(' ')}>{item.name}</a>
           {index === singerNum - 1 ? (
             <></>
@@ -222,7 +222,7 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
   const renderLyric = () => {
     return currentLyric.map((item, index) => {
       return (
-        <li className={currentLineNum === index ? styles.currentLyric : ''}>
+        <li className={currentLineNum === index ? styles.currentLyric : ''} key={index}>
           {item.txt}<br />{item.txtCn}
         </li>
       )

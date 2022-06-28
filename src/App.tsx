@@ -7,6 +7,7 @@ import styles from "./App.module.less";
 import WyPlayer from "./components/wyUi/wyPlayer";
 import Sheet from "./pages/sheetList";
 import SheetInfo from "./pages/sheetInfo";
+import { SongInfo } from "./pages/songInfo";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -85,6 +86,7 @@ function App() {
             <Route path="/home" component={Home} />
             <Route path="/sheet" component={Sheet} />
             <Route path="/sheetInfo/:id" component={SheetInfo} />
+            <Route path="/songInfo/:id" component={SongInfo} />
           </Content>
           <Footer className={styles.footer}>
             Ant Design ©2022 Implement By React

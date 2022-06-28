@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { getSongSheetDetail } from "../../services/sheet.service";
-import { SongSheet } from "../../types/GlobalTypes";
-import { timeFormat } from "../../utils/timeFormat";
+import { Singer, Song, SongSheet } from "../../types/GlobalTypes";
+import { songTimeFormat, timeFormat } from "../../utils/timeFormat";
 import { PlayCircleOutlined, UpOutlined, DownOutlined } from "@ant-design/icons";
 import styles from "./index.module.less"
-import { Button, Tag } from "antd";
+import { Button, Table, Tag } from "antd";
+import { useAppSelector } from "../../redux/hooks";
+import { selectCurrentSong } from "../../redux/playerSlice";
+import { findIndex } from "../../utils/array";
+import { getSongList } from "../../services/song.service";
+import { insertSong, insertSongs, onPlaySheetBatch } from "../../services/batchAction.service";
 
 interface SheetInfoParams {
   id: string
@@ -22,6 +27,40 @@ type ControlDesc = {
   iconCls: 'up' | 'down'
 }
 
+const listTableColumns = [
+  {
+    key: 'index',
+    dataIndex: 'index',
+    width: '80px'
+  },
+  {
+    key: 'title',
+    title: '标题',
+    dataIndex: 'title'
+  },
+  {
+    key: 'time',
+    title: '时长',
+    dataIndex: 'time',
+    width: '120px'
+  },
+  {
+    key: 'singer',
+    title: '歌手',
+    dataIndex: 'singer',
+    width: '80px'
+  },
+  {
+    key: 'album',
+    title: '专辑',
+    dataIndex: 'album'
+  }
+]
+
+const noDataTip = {
+  emptyText: '暂无音乐！',
+}
+
 export default function SheetInfo() {
   const initControlDesc: ControlDesc = {
     isExpand: false,
@@ -34,6 +73,10 @@ export default function SheetInfo() {
   const [sheetInfo, setSheetInfo] = useState<SongSheet | null>(null)
   const [description, setDescription] = useState<Description | null>(null)
   const [controlDesc, setControlDesc] = useState<ControlDesc>(initControlDesc)
+  const [currentIndex, setCurrentIndex] = useState<number>(-1)
+
+  const currentSong = useAppSelector(selectCurrentSong)
+  const history = useHistory()
 
   useEffect(() => {
     getSongSheetInfo()
@@ -42,6 +85,19 @@ export default function SheetInfo() {
   useEffect(() => {
     changeDesc(sheetInfo?.description ?? '')
   }, [sheetInfo])
+
+  useEffect(() => {
+    listenCurrent()
+  }, [currentSong])
+
+  const listenCurrent = () => {
+    console.log('currentsong', currentSong)
+    if (currentSong) {
+      const index = findIndex(sheetInfo?.tracks ?? [], currentSong)
+      console.log('index', index)
+      setCurrentIndex(index)
+    }
+  }
 
   const getSongSheetInfo = async () => {
     const sheetInfo = await getSongSheetDetail(Number(params.id))
@@ -76,12 +132,81 @@ export default function SheetInfo() {
     return { __html: newText };
   }
 
+  const addSongToList = async (song: Song, isPlay = false) => {
+    console.log('song', song)
+    if (!currentSong || currentSong.id !== song.id) {
+      const list = await getSongList(song)
+      if (list.length) {
+        insertSong(list[0], isPlay)
+      }
+    }
+  }
+
+  const addSongsToList = async (songs: Song[]) => {
+    const list = await getSongList(songs)
+    if (list.length) {
+      insertSongs(list)
+    }
+  }
+
+  const handleRouteJump = (id: number) => {
+    history.push(`/songInfo/${id}`)
+  }
+
   const renderTags = () => {
     return sheetInfo?.tags.map((item, index) => {
       return <Tag className={styles.tagItem} key={index}>{item}</Tag>
     })
   }
 
+  const renderTableSingers = (ar: Singer[]) => {
+    const length = ar.length
+    return ar.map((item, index) => {
+      return (
+        <div key={index}>
+          <a>{item.name}</a>
+          <em hidden={index === length - 1}>/</em>
+        </div>
+      )
+    })
+  }
+
+  const createTableData = () => {
+    return sheetInfo?.tracks.map((item, index) => {
+      return {
+        key: item.id,
+        index: (
+          <div className='first-col'>
+            <span>{index + 1}</span>
+            <i className={['ico', currentIndex === index ? 'current' : ''].join(' ')} onClick={() => { addSongToList(item, true) }}></i>
+          </div>
+        ),
+        title: (
+          <div className="song-name">
+            <a onClick={() => { handleRouteJump(item.id) }}>{item.name}</a>
+          </div>
+        ),
+        time: (
+          <div className="time-col">
+            <span>{songTimeFormat(item.dt / 1000)}</span>
+            <p className="icons">
+              <i className="ico add" title="添加" onClick={() => { addSongToList(item) }}></i>
+              <i className="ico like" title="收藏"></i>
+              <i className="ico share" title="分享"></i>
+            </p>
+          </div >
+        ),
+        singer: (
+          <div>
+            {renderTableSingers(item.ar)}
+          </div>
+        ),
+        album: (
+          <div>{item.al.name}</div>
+        )
+      }
+    })
+  }
 
   return (
     <div className={[styles.sheetInfo, 'wrap', 'feature-wrap'].join(' ')}>
@@ -111,10 +236,10 @@ export default function SheetInfo() {
 
               <div className={styles.btns}>
                 <Button.Group className={styles.btn}>
-                  <Button className={styles.play} type="primary" icon={<PlayCircleOutlined />}>
+                  <Button className={styles.play} type="primary" icon={<PlayCircleOutlined />} onClick={() => { onPlaySheetBatch(sheetInfo?.id ?? 0) }}>
                     播放
                   </Button>
-                  <Button className={styles.add} type="primary">+</Button>
+                  <Button className={styles.add} type="primary" onClick={() => { addSongsToList(sheetInfo?.tracks ?? []) }}>+</Button>
                 </Button.Group>
                 <Button className={[styles.btn, styles.like].join(' ')}>
                   <span>收藏</span>({sheetInfo?.subscribedCount})
@@ -138,11 +263,29 @@ export default function SheetInfo() {
               </div>
               <div className={styles.expand} onClick={toggleDesc} >
                 <span>{controlDesc.label}</span>
-                <Button type='text' icon={controlDesc.iconCls === 'up' ? <UpOutlined /> : <DownOutlined />}></Button>
+                <i>{controlDesc.iconCls === 'up' ? <UpOutlined /> : <DownOutlined />}</i>
               </div>
             </div >
           </div >
         </div >
+
+
+        <div className='wy-sec'>
+          <div className={[styles.uTitle, 'wy-sec-wrap', 'clearfix'].join(' ')}>
+            <h3 className='wy-sec-tit'>
+              <span className={styles.fFf2}>歌曲列表</span>
+            </h3>
+            <span className={[styles.sub, styles.sFc3].join(' ')}>
+              {sheetInfo?.tracks.length} 首歌
+            </span>
+            <div className={[styles.more, styles.sFc3].join(' ')}>
+              播放：
+              <strong className={styles.sFc6}>{sheetInfo?.playCount}</strong>
+              次
+            </div>
+          </div>
+          <Table className='wy-table' locale={noDataTip} pagination={false} bordered columns={listTableColumns} dataSource={createTableData()} />
+        </div>
       </div >
     </div >
   )
