@@ -13,9 +13,15 @@ export type HotTag = {
 export type Singer = {
   id: number;
   name: string;
+  alias: string[];
   picUrl: string;
   albumSize: number;
 };
+
+export type SingerDetail = {
+  artist: Singer;
+  hotSongs: Song[];
+}
 
 export type SingerParams = {
   offset: number;

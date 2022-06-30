@@ -102,11 +102,15 @@ export default function Home() {
     dispatch(setCurrentIndex({ currentIndex: 0 }));
   };
 
-  const handleRouteJump = (name: string) => {
+  const handleTagRouteJump = (name: string) => {
     history.push({
       pathname: '/sheet',
       search: `?cat=${name}`
     })
+  }
+
+  const handleSingerRouteJump = (id: number) => {
+    history.push(`/singer/${id}`)
   }
 
   const renderCarouselItem = () => {
@@ -124,7 +128,7 @@ export default function Home() {
   const renderHotTags = () => {
     return hotTags.map((item, index) => {
       return (
-        <a className={styles.hotTagItem} key={index} onClick={() => { handleRouteJump(item.name) }} >
+        <a className={styles.hotTagItem} key={index} onClick={() => { handleTagRouteJump(item.name) }} >
           {item.name}
         </a>
       );
@@ -146,7 +150,7 @@ export default function Home() {
   const renderSettledSinger = () => {
     return settledSinger.map((item, index) => {
       return (
-        <div className={styles.card} key={index}>
+        <div className={styles.card} key={index} onClick={() => { handleSingerRouteJump(item.id) }}>
           <div className={styles.pic}>
             <img src={item.picUrl} alt={item.name} />
           </div>
