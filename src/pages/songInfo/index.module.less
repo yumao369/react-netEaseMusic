@@ -57,6 +57,9 @@
           .user {
             margin: 0 0 12px;
             .singers {
+              .singer {
+                color: @wy-text-prev-color;
+              }
               span {
                 float: left;
               }
@@ -64,6 +67,7 @@
                 float: left;
                 li {
                   float: left;
+                  list-style: none;
                   .sFc7 {
                     color: @link-color;
                   }
@@ -81,7 +85,19 @@
             margin-bottom: 25px;
             margin-right: -10px;
             .btn {
+              .play {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+              }
+              .add {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+              }
               margin-right: 10px;
+            }
+            .like,
+            .share {
+              border-radius: 4px;
             }
           }
         }

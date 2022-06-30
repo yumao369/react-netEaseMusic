@@ -28,6 +28,14 @@ const generateSongList = (songs: Song[], urls: SongUrl[]): Song[] => {
   return result;
 };
 
+export const getSongDetail = async (ids: string): Promise<Song> => {
+  const params = { ids: ids }
+  const res = await API.get("song/detail", { params })
+  console.log('res', res)
+  const data = res.data.songs
+  return data[0]
+}
+
 export const getLyric = async (id: number): Promise<Lyric> => {
   const params = { id: id }
   const res = await API.get("lyric", { params })

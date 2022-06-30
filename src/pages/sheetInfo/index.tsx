@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import { getSongSheetDetail } from "../../services/sheet.service";
-import { Singer, Song, SongSheet } from "../../types/GlobalTypes";
+import { Control, Singer, Song, SongSheet } from "../../types/GlobalTypes";
 import { songTimeFormat, timeFormat } from "../../utils/timeFormat";
 import { PlayCircleOutlined, UpOutlined, DownOutlined } from "@ant-design/icons";
 import styles from "./index.module.less"
@@ -19,12 +19,6 @@ interface SheetInfoParams {
 interface Description {
   short: string,
   long: string
-}
-
-type ControlDesc = {
-  isExpand: boolean,
-  label: '展开' | '收起',
-  iconCls: 'up' | 'down'
 }
 
 const listTableColumns = [
@@ -62,7 +56,7 @@ const noDataTip = {
 }
 
 export default function SheetInfo() {
-  const initControlDesc: ControlDesc = {
+  const initControlDesc: Control = {
     isExpand: false,
     label: '展开',
     iconCls: 'down'
@@ -72,7 +66,7 @@ export default function SheetInfo() {
 
   const [sheetInfo, setSheetInfo] = useState<SongSheet | null>(null)
   const [description, setDescription] = useState<Description | null>(null)
-  const [controlDesc, setControlDesc] = useState<ControlDesc>(initControlDesc)
+  const [controlDesc, setControlDesc] = useState<Control>(initControlDesc)
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
 
   const currentSong = useAppSelector(selectCurrentSong)
@@ -84,9 +78,11 @@ export default function SheetInfo() {
 
   useEffect(() => {
     changeDesc(sheetInfo?.description ?? '')
+    listenCurrent()
   }, [sheetInfo])
 
   useEffect(() => {
+    console.log(currentSong)
     listenCurrent()
   }, [currentSong])
 

@@ -93,3 +93,9 @@ export type SheetList = {
   playlists: SongSheet[];
   total: number;
 }
+
+export type Control = {
+  isExpand: boolean,
+  label: '展开' | '收起',
+  iconCls: 'up' | 'down'
+}
