@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Redirect, useHistory, Link } from "react-router-dom";
 import { Layout, Menu, Input } from "antd";
 import { MobileOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -9,6 +9,9 @@ import Sheet from "./pages/sheetList";
 import SheetInfo from "./pages/sheetInfo";
 import { SongInfo } from "./pages/songInfo";
 import { SingerDetailCom } from "./pages/singerDetail";
+import WySearch from "./components/wyUi/wySearch";
+import { search } from "./services/search.service";
+import { SearchResult } from "./types/GlobalTypes";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -35,6 +38,24 @@ function App() {
     })
   }*/
 
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [searchResult, setSearchResult] = useState<SearchResult>({})
+
+  useEffect(() => {
+    onSearch()
+  }, [searchInput])
+
+  const onSearch = async () => {
+    if (searchInput) {
+      const data = await search(searchInput)
+      setSearchResult(data)
+    }
+  }
+
+  const getSearchInput = (input: string) => {
+    setSearchInput(input)
+  }
+
   const renderMenuItem = () => {
     return menu.map((item, index) => {
       return <Menu.Item key={index} >
@@ -60,7 +81,7 @@ function App() {
                 </Menu>
               </div>
               <div className={styles.right}>
-                <Search placeholder="歌单/歌手/歌曲" enterButton />
+                <WySearch getSearchInput={getSearchInput} searchResult={searchResult} />
                 <div className={styles.member}>
                   <div className={styles.noLogin}>
                     <Menu mode="horizontal" theme="dark">

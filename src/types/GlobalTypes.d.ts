@@ -105,3 +105,9 @@ export type Control = {
   label: '展开' | '收起',
   iconCls: 'up' | 'down'
 }
+
+export type SearchResult = {
+  artists?: Singer[];
+  playlists?: SongSheet[];
+  songs?: Song[];
+}
