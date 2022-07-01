@@ -3,9 +3,13 @@ import React, { useEffect, useState } from "react";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import { useHistory, useParams } from "react-router-dom";
 import { getSingerDetail } from "../../services/singer.service";
-import { SingerDetail } from "../../types/GlobalTypes";
+import { SingerDetail, Song } from "../../types/GlobalTypes";
 import styles from "./index.module.less"
 import { songTimeFormat } from "../../utils/timeFormat";
+import { useAppSelector } from "../../redux/hooks";
+import { selectCurrentSong } from "../../redux/playerSlice";
+import { getSongList } from "../../services/song.service";
+import { insertSong, insertSongs } from "../../services/batchAction.service";
 
 interface SingerDetailParams {
   id: string
@@ -45,6 +49,8 @@ export function SingerDetailCom() {
 
   const [singer, setSinger] = useState<SingerDetail | null>(null)
 
+  const currentSong = useAppSelector(selectCurrentSong)
+
   useEffect(() => {
     getSinger()
   }, [])
@@ -57,6 +63,23 @@ export function SingerDetailCom() {
 
   const handleRouteJump = (id: number) => {
     history.push(`/songInfo/${id}`)
+  }
+
+  const addSongToList = async (song: Song, isPlay = false) => {
+    console.log('song', song)
+    if (!currentSong || currentSong.id !== song.id) {
+      const list = await getSongList(song)
+      if (list.length) {
+        insertSong(list[0], isPlay)
+      }
+    }
+  }
+
+  const addSongsToList = async (songs: Song[]) => {
+    const list = await getSongList(songs)
+    if (list.length) {
+      insertSongs(list)
+    }
   }
 
   const createTableData = () => {
