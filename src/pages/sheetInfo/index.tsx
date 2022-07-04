@@ -74,7 +74,7 @@ export default function SheetInfo() {
 
   useEffect(() => {
     getSongSheetInfo()
-  }, [])
+  }, [params])
 
   useEffect(() => {
     changeDesc(sheetInfo?.description ?? '')

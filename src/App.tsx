@@ -12,6 +12,7 @@ import { SingerDetailCom } from "./pages/singerDetail";
 import WySearch from "./components/wyUi/wySearch";
 import { search } from "./services/search.service";
 import { SearchResult } from "./types/GlobalTypes";
+import { isEmptyObject } from "./utils/tools";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -48,8 +49,31 @@ function App() {
   const onSearch = async () => {
     if (searchInput) {
       const data = await search(searchInput)
-      setSearchResult(data)
+      const highLightedData = highlightKeyWords(searchInput, data)
+      setSearchResult(highLightedData)
     }
+  }
+
+  const highlightKeyWords = (keywords: string, result: SearchResult): SearchResult => {
+    if (!isEmptyObject(result)) {
+      const reg = new RegExp(keywords, 'ig');
+      if (result['artists']) {
+        result['artists'].forEach(item => {
+          item.name = item.name.replace(reg, '<span class="highlight">$&</span>');
+        })
+      }
+      if (result['playlists']) {
+        result['playlists'].forEach(item => {
+          item.name = item.name.replace(reg, '<span class="highlight">$&</span>');
+        })
+      }
+      if (result['songs']) {
+        result['songs'].forEach(item => {
+          item.name = item.name.replace(reg, '<span class="highlight">$&</span>');
+        })
+      }
+    }
+    return result
   }
 
   const getSearchInput = (input: string) => {

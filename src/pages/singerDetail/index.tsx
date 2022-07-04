@@ -53,7 +53,7 @@ export function SingerDetailCom() {
 
   useEffect(() => {
     getSinger()
-  }, [])
+  }, [params])
 
   const getSinger = async () => {
     const singerDetail = await getSingerDetail(params.id)

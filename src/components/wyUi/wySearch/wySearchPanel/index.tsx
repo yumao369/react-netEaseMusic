@@ -1,43 +1,56 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useHistory } from "react-router-dom";
+import { fromEvent } from "rxjs";
+import { tap } from "rxjs/internal/operators";
 import { SearchResult } from "../../../../types/GlobalTypes";
 import styles from "./index.module.less"
 
 interface WySearchPanelProps {
-  searchResult: SearchResult
+  searchResult: SearchResult;
+  onClickHide: () => void
 }
 
 export default function WySearchPanel(props: WySearchPanelProps) {
 
   const history = useHistory()
+  const doc = document
 
-  const toInfo = (path: [string, number]) => {
-    console.log('toInfo :', path);
+  const toInfo = (e: React.MouseEvent, path: [string, number]) => {
+    e.stopPropagation()
     if (path[1]) {
       history.push(`${path[0]}/${path[1]}`)
     }
+    props.onClickHide()
   }
+
+  useEffect(() => {
+    const docClick$ = fromEvent(doc, 'click')
+    const subscriptiondoc = docClick$.subscribe(() => { props.onClickHide() })
+    return () => {
+      subscriptiondoc.unsubscribe()
+    }
+  })
 
   const renderSongs = () => {
     return props.searchResult.songs?.map(item => {
-      return <li className='ellipsis' key={item.id} onClick={() => { toInfo(['/songInfo', item.id]) }}>{item.name}</li>
+      return <li className='ellipsis' key={item.id} onClick={(e) => { toInfo(e, ['/songInfo', item.id]) }} dangerouslySetInnerHTML={{ __html: item.name }}></li>
     })
   }
 
   const renderSingers = () => {
     return props.searchResult.artists?.map(item => {
-      return <li className='ellipsis' key={item.id} onClick={() => { toInfo(['/singer', item.id]) }}>{item.name}</li>
+      return <li className='ellipsis' key={item.id} onClick={(e) => { toInfo(e, ['/singer', item.id]) }} dangerouslySetInnerHTML={{ __html: item.name }}></li>
     })
   }
 
   const renderSheets = () => {
     return props.searchResult.playlists?.map(item => {
-      return <li className='ellipsis' key={item.id} onClick={() => { toInfo(['/sheetInfo', item.id]) }}>{item.name}</li>
+      return <li className='ellipsis' key={item.id} onClick={(e) => { toInfo(e, ['/sheetInfo', item.id]) }} dangerouslySetInnerHTML={{ __html: item.name }}></li>
     })
   }
 
   return (
-    <div className={styles.searchPanel}>
+    <div className={styles.searchPanel} >
       <div className={styles.listWrap}>
 
         <div className={[styles.listItem, 'clearfix'].join(' ')} hidden={!props.searchResult.songs}>

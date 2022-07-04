@@ -31,7 +31,7 @@ export function SongInfo() {
   useEffect(() => {
     getSong()
     getSongLyric()
-  }, [])
+  }, [params])
 
   const getSong = async () => {
     const songInfo = await getSongDetail(params.id)
