@@ -6,9 +6,11 @@ import {
 import persistReducer from "redux-persist/es/persistReducer";
 import storage from "redux-persist/lib/storage";
 import playReducer from "./playerSlice";
+import memberReducer from "./memberSlice"
 
 const reducers = combineReducers({
   playReducer,
+  memberReducer
 });
 
 //const persistConfig = {
