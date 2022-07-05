@@ -9,6 +9,7 @@ import { findIndex, shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
 import WyPlayerPanel, { WyPlayerPanelRef } from "./wyPlayerPanel";
+import { useSpring, animated } from 'react-spring'
 
 const modeTypes: PlayMode[] = [
   {
@@ -34,6 +35,7 @@ export default function WyPlayer() {
 
   const audioRef = useRef<HTMLAudioElement>(null)
   const wyPlayerPanelRef = useRef<WyPlayerPanelRef | null>(null)
+  const [show, setShow] = useState<boolean>(false)
   const [currentTime, setCurrentTime] = useState(initDuration)
   const [playOffset, setPlayOffset] = useState(0)
   const [songReady, setSongReady] = useState(false)
@@ -41,6 +43,7 @@ export default function WyPlayer() {
   const [showVolPanel, setShowVolPanel] = useState(false)
   const [showListPane, setShowListPanel] = useState(false)
   const [selfClick, setSelfClick] = useState(false)
+  const [lock, setLock] = useState(false)
 
   const dispatch = useAppDispatch()
 
@@ -71,6 +74,14 @@ export default function WyPlayer() {
   useEffect(() => {
     handleModeChange()
   }, [mode])
+
+  const animationStyle = useSpring({
+    bottom: show ? 0 : -71,
+    from: {
+      bottom: -71
+    },
+    config: { duration: 300 }
+  })
 
   const handleDocClick = () => {
     setShowVolPanel(false)
@@ -238,6 +249,10 @@ export default function WyPlayer() {
     })
   }
 
+  const handleLock = () => {
+    setLock(!lock)
+  }
+
   const renderAuthor = () => {
     const length = currentSong?.ar.length
     return currentSong?.ar.map((item, index) => {
@@ -249,12 +264,15 @@ export default function WyPlayer() {
   }
 
   return (
-    <div
+    <animated.div
       className={styles.musicPlayer}
       //@ts-ignore
-      onClick={selfClickChange}>
-      <div className={styles.lock}>
-        <div className={styles.left}><i className={styles.leftP}></i></div>
+      onClick={selfClickChange}
+      onMouseEnter={() => { setShow(true) }}
+      onMouseLeave={() => { setShow(false) }}
+      style={lock ? {} : animationStyle}>
+      <div className={styles.lock} onClick={handleLock} >
+        <div className={styles.left}><i className={[styles.leftP, lock ? styles.locked : ''].join(' ')}></i></div>
       </div>
       <div className={styles.hand}></div>
       <div className={styles.container}>
@@ -320,6 +338,6 @@ export default function WyPlayer() {
         //@ts-ignore
         onTimeUpdate={onTimeupdate}
         onEnded={onEnded}></audio>
-    </div>
+    </animated.div>
   )
 }
