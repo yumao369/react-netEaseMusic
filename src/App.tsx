@@ -13,6 +13,8 @@ import WySearch from "./components/wyUi/wySearch";
 import { search } from "./services/search.service";
 import { SearchResult } from "./types/GlobalTypes";
 import { isEmptyObject } from "./utils/tools";
+import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
+import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -141,6 +143,9 @@ function App() {
         </Layout>
       </div>
       <WyPlayer />
+      <WyLayerModal>
+        <WyLayerDefault></WyLayerDefault>
+      </WyLayerModal>
     </Router>
   );
 }
