@@ -24,10 +24,10 @@ export const memberSlice = createSlice({
   initialState: defaultState,
   reducers: {
     setModalVisible: (state, action: PayloadAction<{ modalVisible: boolean }>) => {
-      return { ...state, playing: action.payload.modalVisible };
+      return { ...state, modalVisible: action.payload.modalVisible };
     },
-    setModalType: (state, action: PayloadAction<{ modalType: boolean }>) => {
-      return { ...state, playing: action.payload.modalType };
+    setModalType: (state, action: PayloadAction<{ modalType: ModalTypes }>) => {
+      return { ...state, modalType: action.payload.modalType };
     }
   }
 })

@@ -15,6 +15,8 @@ import { SearchResult } from "./types/GlobalTypes";
 import { isEmptyObject } from "./utils/tools";
 import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
 import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
+import WyLayerLogin from "./components/wyUi/wyLayer/wyLayerLogin";
+import WyLayerRegister from "./components/wyUi/wyLayer/wyLayerRegister";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -143,9 +145,7 @@ function App() {
         </Layout>
       </div>
       <WyPlayer />
-      <WyLayerModal>
-        <WyLayerDefault></WyLayerDefault>
-      </WyLayerModal>
+      <WyLayerModal default={<WyLayerDefault />} login={<WyLayerLogin />} register={<WyLayerRegister />} />
     </Router>
   );
 }

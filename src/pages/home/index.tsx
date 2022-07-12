@@ -24,6 +24,7 @@ import {
 } from "../../redux/playerSlice";
 import { playsheet } from "../../services/sheet.service";
 import { useHistory } from "react-router-dom";
+import { controlModal } from "../../services/batchAction.service";
 
 export default function Home() {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -113,6 +114,10 @@ export default function Home() {
     history.push(`/singer/${id}`)
   }
 
+  const openModal = () => {
+    controlModal()
+  }
+
   const renderCarouselItem = () => {
     return banners.map((item, index) => {
       return (
@@ -198,7 +203,7 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.right}>
-            <MemberCard />
+            <MemberCard openModal={openModal} />
             <div className={styles.settledSinger}>
               <div className={styles.title}>
                 <b className={styles.titTxt}>入驻歌手</b>

@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectSongList, setCurrentIndex, setPlayList, setSongList } from "../redux/playerSlice"
 import { Song } from "../types/GlobalTypes";
 import { findIndex } from "../utils/array";
+import { ModalTypes, setModalType, setModalVisible } from "../redux/memberSlice";
 
 /**
  * optimize
@@ -57,4 +58,9 @@ export const insertSongs = (songs: Song[]) => {
   })
   store.dispatch(setSongList({ songList: songList }))
   store.dispatch(setPlayList({ playList: playList }))
+}
+
+export const controlModal = (modalVisible = true, modalType = ModalTypes.Default) => {
+  store.dispatch(setModalType({ modalType: modalType }))
+  store.dispatch(setModalVisible({ modalVisible: modalVisible }))
 }
