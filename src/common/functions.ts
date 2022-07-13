@@ -12,7 +12,6 @@ class SwitchExpr<T> {
       this.val = caseValue
       this.shot = true
     }
-    console.log('switchthis', this)
     return this
   }
 
