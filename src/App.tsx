@@ -17,6 +17,8 @@ import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
 import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
 import WyLayerLogin from "./components/wyUi/wyLayer/wyLayerLogin";
 import WyLayerRegister from "./components/wyUi/wyLayer/wyLayerRegister";
+import { controlModal } from "./services/batchAction.service";
+import { ModalTypes } from "./redux/memberSlice";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -84,6 +86,14 @@ function App() {
     setSearchInput(input)
   }
 
+  const handleLogin = () => {
+    controlModal(true, ModalTypes.LoginByPhone)
+  }
+
+  const handleRegister = () => {
+    controlModal(true, ModalTypes.Register)
+  }
+
   const renderMenuItem = () => {
     return menu.map((item, index) => {
       return <Menu.Item key={index} >
@@ -114,10 +124,10 @@ function App() {
                   <div className={styles.noLogin}>
                     <Menu mode="horizontal" theme="dark">
                       <SubMenu title="登陆" key={"login"}>
-                        <Menu.Item icon={<MobileOutlined />} key={"sign up"}>
+                        <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleLogin}>
                           手机登陆
                         </Menu.Item>
-                        <Menu.Item icon={<UserAddOutlined />} key={"sign in"}>
+                        <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={handleRegister}>
                           注册
                         </Menu.Item>
                       </SubMenu>
