@@ -1,14 +1,27 @@
-import React from "react"; console
-import Form from "antd/lib/form/Form";
-import FormItem from "antd/lib/form/FormItem";
-import { Button, Checkbox, Input } from "antd";
+import React, { useState } from "react";
+//import Form from "antd/lib/form/Form";
+//import FormItem from "antd/lib/form/FormItem";
+//import { Button, Checkbox, Input } from "antd";
+import { Formik, FormikValues } from "formik"
+import {
+  SubmitButton,
+  Input,
+  Checkbox,
+  ResetButton,
+  FormikDebug,
+  Form,
+  FormItem,
+} from "formik-antd"
+import { Button } from "antd";
 import { MobileOutlined, LockOutlined } from "@ant-design/icons";
 import styles from "./index.module.less"
 import { ModalTypes, setModalType } from "../../../../redux/memberSlice";
 import { useAppDispatch } from "../../../../redux/hooks";
 import { withFormik, FormikProps, FormikErrors, Field } from 'formik';
+import { message } from "antd";
+import { login } from "../../../../services/member.service";
 
-interface FormValues {
+/*interface FormValues {
   phoneNumber: string;
   password: string;
 }
@@ -23,10 +36,10 @@ const InnerForm = (props: FormikProps<FormValues>) => {
         <Input />
       </FormItem>
       <FormItem validateStatus={touched.phoneNumber && errors.phoneNumber ? "error" : ""} help={errors.phoneNumber} hasFeedback>
-        <Input prefix={<MobileOutlined />} />
+        <Input name="phoneNumber" prefix={<MobileOutlined />} />
       </FormItem>
       <FormItem validateStatus={touched.password && errors.password ? "error" : ""} help={errors.password} hasFeedback>
-        <Input.Password prefix={<LockOutlined />} />
+        <Input.Password name="password" prefix={<LockOutlined />} />
       </FormItem>
       <FormItem>
 
@@ -65,7 +78,71 @@ const MyForm = withFormik<MyFormProps, FormValues>({
   handleSubmit: values => {
 
   }
-})(InnerForm)
+})(InnerForm)*/
+export interface ValueForm {
+  phoneNumber: string;
+  password: string;
+}
+interface ErrorForm {
+  phoneNumber?: string;
+  password?: string
+}
+
+const MyFormTwo = () => {
+
+  const handleSubmit = (value: FormikValues) => {
+    //console.log({ ...value, remember })
+    const loginParams: ValueForm = {
+      phoneNumber: value.phoneNumber,
+      password: value.password
+    }
+    login(loginParams)
+  }
+  return (
+    <Formik
+      initialValues={{
+        phoneNumber: '',
+        password: ''
+      }}
+      onSubmit={(values, actions) => {
+
+        actions.setSubmitting(false)
+        handleSubmit(values)
+      }}
+      validate={values => {
+        const errors: ErrorForm = {}
+        if (!/^1\d{10}$/.test(values.phoneNumber)) {
+          errors.phoneNumber = '请输入正确的手机号'
+        }
+        if (values.password.length < 6) {
+          errors.password = '请输入正确的密码'
+        }
+        return errors
+      }}
+    >
+      {/**
+       * problem:
+       * there is still a problem with the logic of error display.
+       * status:
+       * NOT SOLVED
+       */}
+      <Form>
+        <FormItem name="phoneNumber" hasFeedback>
+          <Input name="phoneNumber" prefix={<MobileOutlined />} />
+        </FormItem>
+        <FormItem name="password" hasFeedback>
+          <Input.Password name="password" prefix={<LockOutlined />} />
+        </FormItem>
+        <FormItem name='remember'>
+
+          <Checkbox name="remember" >记住密码</Checkbox>
+          <SubmitButton type='primary' block={true} className={styles.login} >登陆</SubmitButton>
+        </FormItem>
+
+      </Form>
+    </Formik >
+  )
+}
 
 export default function WyLayerLogin() {
 
@@ -79,7 +156,7 @@ export default function WyLayerLogin() {
     <div>
       <div className="login-phone modal-content">
         <div className="modal-wrap">
-          <MyForm />
+          <MyFormTwo />
         </div>
       </div>
 
