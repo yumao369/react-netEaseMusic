@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Redirect, useHistory, Link } from "react-router-dom";
-import { Layout, Menu, Input } from "antd";
-import { MobileOutlined, UserAddOutlined } from "@ant-design/icons";
+import { Layout, Menu, Input, Avatar, message } from "antd";
+import { MobileOutlined, UserAddOutlined, DownOutlined } from "@ant-design/icons";
 import Home from "./pages/home";
 import styles from "./App.module.less";
 import WyPlayer from "./components/wyUi/wyPlayer";
@@ -11,7 +11,7 @@ import { SongInfo } from "./pages/songInfo";
 import { SingerDetailCom } from "./pages/singerDetail";
 import WySearch from "./components/wyUi/wySearch";
 import { search } from "./services/search.service";
-import { SearchResult } from "./types/GlobalTypes";
+import { SearchResult, User } from "./types/GlobalTypes";
 import { isEmptyObject } from "./utils/tools";
 import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
 import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
@@ -19,6 +19,8 @@ import WyLayerLogin from "./components/wyUi/wyLayer/wyLayerLogin";
 import WyLayerRegister from "./components/wyUi/wyLayer/wyLayerRegister";
 import { controlModal } from "./services/batchAction.service";
 import { ModalTypes } from "./redux/memberSlice";
+import { getUserDetail, logout } from "./services/member.service";
+import { AppContext } from "./context/appContext";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -45,12 +47,32 @@ function App() {
     })
   }*/
 
+  const { onLogOut } = useContext(AppContext)
+  const { uid } = useContext(AppContext)
+
   const [searchInput, setSearchInput] = useState<string>('')
   const [searchResult, setSearchResult] = useState<SearchResult>({})
+  const [user, setUser] = useState<User | null>(null)
+
+
+
+  useEffect(() => {
+    getUDetail()
+  }, [uid])
 
   useEffect(() => {
     onSearch()
   }, [searchInput])
+
+  const getUDetail = async () => {
+    const userId = localStorage.getItem('wyUserId')
+    if (userId) {
+      const user = await getUserDetail(userId)
+      setUser(user)
+    } else {
+      setUser(null)
+    }
+  }
 
   const onSearch = async () => {
     if (searchInput) {
@@ -102,6 +124,47 @@ function App() {
     });
   };
 
+  const renderMember = () => {
+    console.log('user', user)
+    if (!user) {
+      return (
+        <div className={styles.noLogin}>
+          <Menu mode="horizontal" theme="dark">
+            <SubMenu title="登陆" key="log">
+              <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleLogin}>
+                手机登陆
+              </Menu.Item>
+              <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={handleRegister}>
+                注册
+              </Menu.Item>
+            </SubMenu>
+          </Menu>
+        </div>
+      )
+    } else {
+      return (
+        <div className={styles.login}>
+          <Menu mode="horizontal" theme="dark">
+            <SubMenu title={
+              <div>
+                <Avatar src={user.profile.avatarUrl} />
+                <i><DownOutlined /></i>
+              </div>
+            }
+              key='log'>
+              <Menu.Item icon={<MobileOutlined />} key={"sign up"} >
+                个人中心
+              </Menu.Item>
+              <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={onLogOut}>
+                登出
+              </Menu.Item>
+            </SubMenu>
+          </Menu>
+        </div>
+      )
+    }
+  }
+
   return (
     <Router>
       <div className={styles.app}>
@@ -121,18 +184,7 @@ function App() {
               <div className={styles.right}>
                 <WySearch getSearchInput={getSearchInput} searchResult={searchResult} />
                 <div className={styles.member}>
-                  <div className={styles.noLogin}>
-                    <Menu mode="horizontal" theme="dark">
-                      <SubMenu title="登陆" key={"login"}>
-                        <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleLogin}>
-                          手机登陆
-                        </Menu.Item>
-                        <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={handleRegister}>
-                          注册
-                        </Menu.Item>
-                      </SubMenu>
-                    </Menu>
-                  </div>
+                  {renderMember()}
                 </div>
               </div>
             </div>

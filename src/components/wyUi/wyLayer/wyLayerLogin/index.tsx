@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 //import Form from "antd/lib/form/Form";
 //import FormItem from "antd/lib/form/FormItem";
 //import { Button, Checkbox, Input } from "antd";
@@ -20,6 +20,8 @@ import { useAppDispatch } from "../../../../redux/hooks";
 import { withFormik, FormikProps, FormikErrors, Field } from 'formik';
 import { message } from "antd";
 import { login } from "../../../../services/member.service";
+import { controlModal } from "../../../../services/batchAction.service";
+import { AppContext } from "../../../../context/appContext";
 
 /*interface FormValues {
   phoneNumber: string;
@@ -82,27 +84,56 @@ const MyForm = withFormik<MyFormProps, FormValues>({
 export interface ValueForm {
   phoneNumber: string;
   password: string;
+  remember: boolean;
 }
 interface ErrorForm {
   phoneNumber?: string;
-  password?: string
+  password?: string;
+  remember?: boolean
 }
 
 const MyFormTwo = () => {
 
-  const handleSubmit = (value: FormikValues) => {
+  const { onLogin } = useContext(AppContext)
+
+  const handleSubmit = async (value: FormikValues) => {
+    console.log(value)
     //console.log({ ...value, remember })
     const loginParams: ValueForm = {
       phoneNumber: value.phoneNumber,
-      password: value.password
+      password: value.password,
+      remember: value.remember
     }
-    login(loginParams)
+    //if user don't exist,the user 
+    /*const user = await login(loginParams)
+    console.log('user', user)
+    //store user ID in memory
+    if (user.code !== 200) {
+      message.warn(`${user.message || '登录失败'}`)
+    } else {
+      message.success('登录成功')
+      localStorage.setItem('wyUserId', user.profile.userId.toString())
+
+      if (loginParams.remember) {
+        localStorage.setItem('wyRememberLogin', JSON.stringify(loginParams))
+      } else {
+        localStorage.removeItem('wyRememberLogin')
+      }
+    }*/
+
+    if (onLogin) {
+      onLogin(loginParams)
+    }
+
+    controlModal(false)
+
   }
   return (
     <Formik
       initialValues={{
         phoneNumber: '',
-        password: ''
+        password: '',
+        remember: false
       }}
       onSubmit={(values, actions) => {
 
@@ -126,7 +157,7 @@ const MyFormTwo = () => {
        * status:
        * NOT SOLVED
        */}
-      <Form>
+      <Form >
         <FormItem name="phoneNumber" hasFeedback>
           <Input name="phoneNumber" prefix={<MobileOutlined />} />
         </FormItem>

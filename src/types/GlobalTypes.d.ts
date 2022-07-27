@@ -139,3 +139,13 @@ export type User = {
     eventCount: number;
   };
 };
+
+export type logOutResp = {
+  [key: string]: any
+}
+
+export type BaseResponse = {
+  code: number;
+  msg?: string;
+  message?: string
+}
