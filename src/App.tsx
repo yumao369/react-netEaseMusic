@@ -21,6 +21,7 @@ import { controlModal } from "./services/batchAction.service";
 import { ModalTypes } from "./redux/memberSlice";
 import { getUserDetail, logout } from "./services/member.service";
 import { AppContext } from "./context/appContext";
+import MyCenter from "./pages/member/myCenter";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -37,32 +38,18 @@ const menu = [
   },
 ];
 
-function App() {
-  /*const history = useHistory()
-
-  const handleRouteJump = (path: string) => {
-    console.log('history', history)
-    history.push({
-      pathname: path
-    })
-  }*/
+function Member() {
+  const history = useHistory()
 
   const { onLogOut } = useContext(AppContext)
   const { uid } = useContext(AppContext)
 
-  const [searchInput, setSearchInput] = useState<string>('')
-  const [searchResult, setSearchResult] = useState<SearchResult>({})
   const [user, setUser] = useState<User | null>(null)
-
-
 
   useEffect(() => {
     getUDetail()
   }, [uid])
 
-  useEffect(() => {
-    onSearch()
-  }, [searchInput])
 
   const getUDetail = async () => {
     if (uid) {
@@ -72,6 +59,69 @@ function App() {
       setUser(null)
     }
   }
+
+  const handleLogin = () => {
+    controlModal(true, ModalTypes.LoginByPhone)
+  }
+
+  const handleRegister = () => {
+    controlModal(true, ModalTypes.Register)
+  }
+
+  const handleMyCenterRouteJump = () => {
+    history.push(`/member/${uid}`)
+  }
+
+  return (
+    <div className={styles.member}>
+      {
+        user ? (
+          <div className={styles.login}>
+            <Menu mode="horizontal" theme="dark">
+              <SubMenu title={
+                <div>
+                  <Avatar src={user.profile.avatarUrl} />
+                  <i><DownOutlined /></i>
+                </div>
+              }
+                key='log'>
+                <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleMyCenterRouteJump}>
+                  个人中心
+                </Menu.Item>
+                <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={onLogOut}>
+                  登出
+                </Menu.Item>
+              </SubMenu>
+            </Menu>
+          </div>
+        ) : (
+          <div className={styles.noLogin}>
+            <Menu mode="horizontal" theme="dark">
+              <SubMenu title="登陆" key="log">
+                <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleLogin}>
+                  手机登陆
+                </Menu.Item>
+                <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={handleRegister}>
+                  注册
+                </Menu.Item>
+              </SubMenu>
+            </Menu>
+          </div>
+        )
+      }
+
+    </div>
+  )
+}
+
+function App() {
+
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [searchResult, setSearchResult] = useState<SearchResult>({})
+
+  useEffect(() => {
+    onSearch()
+  }, [searchInput])
 
   const onSearch = async () => {
     if (searchInput) {
@@ -107,14 +157,6 @@ function App() {
     setSearchInput(input)
   }
 
-  const handleLogin = () => {
-    controlModal(true, ModalTypes.LoginByPhone)
-  }
-
-  const handleRegister = () => {
-    controlModal(true, ModalTypes.Register)
-  }
-
   const renderMenuItem = () => {
     return menu.map((item, index) => {
       return <Menu.Item key={index} >
@@ -123,46 +165,6 @@ function App() {
     });
   };
 
-  const renderMember = () => {
-    console.log('user', user)
-    if (!user) {
-      return (
-        <div className={styles.noLogin}>
-          <Menu mode="horizontal" theme="dark">
-            <SubMenu title="登陆" key="log">
-              <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleLogin}>
-                手机登陆
-              </Menu.Item>
-              <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={handleRegister}>
-                注册
-              </Menu.Item>
-            </SubMenu>
-          </Menu>
-        </div>
-      )
-    } else {
-      return (
-        <div className={styles.login}>
-          <Menu mode="horizontal" theme="dark">
-            <SubMenu title={
-              <div>
-                <Avatar src={user.profile.avatarUrl} />
-                <i><DownOutlined /></i>
-              </div>
-            }
-              key='log'>
-              <Menu.Item icon={<MobileOutlined />} key={"sign up"} >
-                个人中心
-              </Menu.Item>
-              <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={onLogOut}>
-                登出
-              </Menu.Item>
-            </SubMenu>
-          </Menu>
-        </div>
-      )
-    }
-  }
 
   return (
     <Router>
@@ -182,9 +184,7 @@ function App() {
               </div>
               <div className={styles.right}>
                 <WySearch getSearchInput={getSearchInput} searchResult={searchResult} />
-                <div className={styles.member}>
-                  {renderMember()}
-                </div>
+                <Member />
               </div>
             </div>
           </Header>
@@ -199,6 +199,7 @@ function App() {
             <Route path="/sheetInfo/:id" component={SheetInfo} />
             <Route path="/songInfo/:id" component={SongInfo} />
             <Route path="/singer/:id" component={SingerDetailCom} />
+            <Route path="/member/:id" component={MyCenter} />
           </Content>
           <Footer className={styles.footer}>
             Ant Design ©2022 Implement By React

@@ -144,6 +144,23 @@ export type Signin = {
   point?: number
 }
 
+export type recordVal = {
+  playCount: number;
+  score: number;
+  song: Song;
+};
+
+type recordKeys = 'weekData' | 'allData';
+
+export type UserRecord = {
+  [key in recordKeys]: recordVal[];
+}
+
+export type UserSheet = {
+  self: SongSheet[],
+  subscribed: SongSheet[]
+}
+
 export type AnyJson = {
   [key: string]: any
 }

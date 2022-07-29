@@ -1,8 +1,15 @@
 
 import { AxiosError, AxiosResponse } from "axios";
 import { ValueForm } from "../components/wyUi/wyLayer/wyLayerLogin";
-import { BaseResponse, AnyJson, User, Signin } from "../types/GlobalTypes";
+import { BaseResponse, AnyJson, User, Signin, recordVal, UserSheet, SongSheet } from "../types/GlobalTypes";
 import { API } from "../utils/api";
+
+export enum RecordType {
+  allData,
+  weekDtate
+}
+
+const records = ['allData', 'weekData']
 
 /**
  * problem:
@@ -25,6 +32,23 @@ export const getUserDetail = async (uid: string): Promise<User> => {
   const params = { uid: uid }
   const res = await API.get('/user/detail', { params })
   return res.data
+}
+
+export const getUserRecord = async (uid: string, type = RecordType.allData): Promise<recordVal[]> => {
+  const params = { uid: uid, type: type }
+  const res = await API.get('/user/record', { params })
+  return res.data[records[type]]
+}
+
+export const getUserSheets = async (uid: string): Promise<UserSheet> => {
+  const params = { uid: uid }
+  const res = await API.get('/user/playlist', { params })
+  const playList: SongSheet[] = res.data.playlist
+  return {
+    self: playList.filter(item => !item.subscribed),
+    subscribed: playList.filter(item => item.subscribed)
+  }
+
 }
 
 export const logout = async (): Promise<AnyJson & BaseResponse> => {

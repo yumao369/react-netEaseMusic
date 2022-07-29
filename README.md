@@ -61,7 +61,7 @@ there is still a problem,if you want to get a child component's children of its 
 still need to work:
 1.the styles of header at home page.
 2.the styles of dots of carousel at home page.
-3.resolve
+3.resolve:seems there isn't any method to implement a react route resolve.
 4.optional chaining (?.) Parsing error: Expression expected.eslint(solved by re-installiing eslint in version 7.5.0 can compile successfully,but still have this problem in the code.Check this problem in wyPlayer component.)
 
 obstacles:
@@ -71,13 +71,18 @@ obstacles:
 4.how to get the value of [(ngmodel)] in child component in angular.You can see the proble in wy-player component.
 5.if you pass a state from parent to child and use this state in observables,data will not change if you don't unsubscribe this observable.
 
-about 路由守卫：https://blog.51cto.com/u_12379999/4635824#:~:text=%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E6%98%AF%E6%8C%87%E5%BD%93,%E7%9A%84%E5%B0%B1%E5%8F%AB%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E3%80%82
-
-https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7c7b6122
-
 solutions: 1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
 https://angular.io/guide/view-encapsulation#inspect-generated-css
 for example:in component wyCarousel,for the second div,we need it to be displayed as a wrap.We already have .wrap class that could be used every,but we have some unique styles for this particular wrap,so we can make it possibel like what I have done.
 3.add a dependency to useeffect hook.Please look at the questions I asked at stack overflow and WySlider component in this project.
 4.use ControlvalueAccessor.Look at this artical and answer one https://stackoverflow.com/questions/41350584/angular2-pass-ngmodel-to-a-child-component .Look at this example of how to simply use ngmodel and controvalueaccessor https://github.com/yumao369/angularTest
 5.You can find this instance in wyPlayer and wySlider.There is a simple example of how this means.https://codesandbox.io/s/green-resonance-w4dsh8?file=/src/App.js . When you click the number of this example,the number will be added by 1.Then if you click bbb,you will see the latest number in the console.If you click ccc,you will see the initial number.
+
+about router gaurd：
+https://blog.51cto.com/u_12379999/4635824#:~:text=%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E6%98%AF%E6%8C%87%E5%BD%93,%E7%9A%84%E5%B0%B1%E5%8F%AB%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E3%80%82
+
+https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7c7b6122
+
+about route resolve:
+https://blog.csdn.net/hui8758/article/details/110142559
+https://angular.io/api/router/Resolve
