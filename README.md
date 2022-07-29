@@ -71,6 +71,10 @@ obstacles:
 4.how to get the value of [(ngmodel)] in child component in angular.You can see the proble in wy-player component.
 5.if you pass a state from parent to child and use this state in observables,data will not change if you don't unsubscribe this observable.
 
+about 路由守卫：https://blog.51cto.com/u_12379999/4635824#:~:text=%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E6%98%AF%E6%8C%87%E5%BD%93,%E7%9A%84%E5%B0%B1%E5%8F%AB%E8%B7%AF%E7%94%B1%E5%AE%88%E5%8D%AB%E3%80%82
+
+https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7c7b6122
+
 solutions: 1.https://dev.to/codeprototype/configuring-both-css-modules-and-global-css-for-reactjs-in-webpack-4ci7
 https://angular.io/guide/view-encapsulation#inspect-generated-css
 for example:in component wyCarousel,for the second div,we need it to be displayed as a wrap.We already have .wrap class that could be used every,but we have some unique styles for this particular wrap,so we can make it possibel like what I have done.

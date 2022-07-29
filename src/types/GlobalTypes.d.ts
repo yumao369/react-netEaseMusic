@@ -140,7 +140,11 @@ export type User = {
   };
 };
 
-export type logOutResp = {
+export type Signin = {
+  point?: number
+}
+
+export type AnyJson = {
   [key: string]: any
 }
 

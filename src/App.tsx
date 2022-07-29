@@ -65,9 +65,8 @@ function App() {
   }, [searchInput])
 
   const getUDetail = async () => {
-    const userId = localStorage.getItem('wyUserId')
-    if (userId) {
-      const user = await getUserDetail(userId)
+    if (uid) {
+      const user = await getUserDetail(uid)
       setUser(user)
     } else {
       setUser(null)

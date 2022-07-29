@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useEffect } from "react";
 import { API } from "../../utils/api";
 import styles from "./index.module.less";
@@ -11,6 +11,7 @@ import {
   SingerParams,
   Song,
   SongSheet,
+  User,
 } from "../../types/GlobalTypes";
 import WyCarousel from "./component/wyCarousel";
 import { CarouselRef } from "antd/lib/carousel";
@@ -25,12 +26,17 @@ import {
 import { playsheet } from "../../services/sheet.service";
 import { useHistory } from "react-router-dom";
 import { controlModal } from "../../services/batchAction.service";
+import { AppContext } from "../../context/appContext";
+import { getUserDetail } from "../../services/member.service";
 
 export default function Home() {
+  const { uid } = useContext(AppContext)
+
   const [banners, setBanners] = useState<Banner[]>([]);
   const [hotTags, setHotTags] = useState<HotTag[]>([]);
   const [songSheetList, setSongSheetList] = useState<SongSheet[]>([]);
   const [settledSinger, setSettledSinger] = useState<Singer[]>([]);
+  const [user, setUser] = useState<User | null>(null)
   const carouselRef = useRef<CarouselRef | null>(null);
   const history = useHistory()
 
@@ -48,6 +54,19 @@ export default function Home() {
     getPersonalSheetList();
     getSettledSinger();
   }, []);
+
+  useEffect(() => {
+    getUDetail()
+  }, [uid])
+
+  const getUDetail = async () => {
+    if (uid) {
+      const user = await getUserDetail(uid)
+      setUser(user)
+    } else {
+      setUser(null)
+    }
+  }
 
   const getBanners = async () => {
     const res = await API.get("/banner");
@@ -203,7 +222,7 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.right}>
-            <MemberCard openModal={openModal} />
+            <MemberCard openModal={openModal} user={user} />
             <div className={styles.settledSinger}>
               <div className={styles.title}>
                 <b className={styles.titTxt}>入驻歌手</b>

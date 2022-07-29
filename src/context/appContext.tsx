@@ -2,6 +2,7 @@ import { message } from "antd"
 import React, { Children, createContext } from "react"
 import { ValueForm } from "../components/wyUi/wyLayer/wyLayerLogin"
 import { login, logout } from "../services/member.service"
+import { encodeBase64 } from "../utils/base64"
 import { useLocalStorage } from "../utils/hooks"
 
 interface AppContextProviderProps {
@@ -35,6 +36,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
 
   const onLogin = async (loginParams: ValueForm) => {
     const user = await login(loginParams)
+    console.log('user', user)
     if (user.code !== 200) {
       message.warn(`${user.message || '登录失败'}`)
     } else {
@@ -43,7 +45,7 @@ export const AppContextProvider = (props: AppContextProviderProps) => {
       setUid(user.profile.userId.toString())
       if (loginParams.remember) {
         //localStorage.setItem('wyRememberLogin', JSON.stringify(loginParams))
-        setLoginInfo(JSON.stringify(loginParams))
+        setLoginInfo(JSON.stringify(encodeBase64(loginParams)))
       } else {
         //localStorage.removeItem('wyRememberLogin')
         setLoginInfo(null)

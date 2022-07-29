@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 //import Form from "antd/lib/form/Form";
 //import FormItem from "antd/lib/form/FormItem";
 //import { Button, Checkbox, Input } from "antd";
@@ -22,6 +22,8 @@ import { message } from "antd";
 import { login } from "../../../../services/member.service";
 import { controlModal } from "../../../../services/batchAction.service";
 import { AppContext } from "../../../../context/appContext";
+import { decodeBase64 } from "../../../../utils/base64";
+import { AnyJson } from "../../../../types/GlobalTypes";
 
 /*interface FormValues {
   phoneNumber: string;
@@ -94,8 +96,25 @@ interface ErrorForm {
 
 const MyFormTwo = () => {
 
-  const { onLogin } = useContext(AppContext)
+  const { onLogin, loginInfo } = useContext(AppContext)
 
+  const initValues = (): ValueForm => {
+    if (loginInfo) {
+      const value = decodeBase64(JSON.parse(loginInfo))
+      console.log(value.phoneNumber)
+      return {
+        phoneNumber: value.phoneNumber,
+        password: value.password,
+        remember: value.remember
+      }
+    } else {
+      return {
+        phoneNumber: '',
+        password: '',
+        remember: false
+      }
+    }
+  }
   const handleSubmit = async (value: FormikValues) => {
     console.log(value)
     //console.log({ ...value, remember })
@@ -130,11 +149,7 @@ const MyFormTwo = () => {
   }
   return (
     <Formik
-      initialValues={{
-        phoneNumber: '',
-        password: '',
-        remember: false
-      }}
+      initialValues={initValues()}
       onSubmit={(values, actions) => {
 
         actions.setSubmitting(false)
