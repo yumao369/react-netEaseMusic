@@ -2,11 +2,14 @@ import React, { useContext, useEffect, useState } from "react";
 import SingleSheet from "../../../components/wyUi/singleSheet";
 import { AppContext } from "../../../context/appContext";
 import { onPlaySheetBatch } from "../../../services/batchAction.service";
-import { getUserDetail, getUserRecord, getUserSheets } from "../../../services/member.service";
+import { getUserDetail, getUserRecord, getUserSheets, RecordType } from "../../../services/member.service";
 import { recordVal, User, UserSheet } from "../../../types/GlobalTypes";
+import MyRecords from "../components/myRecords";
 import styles from "./index.module.less"
 
 export default function MyCenter() {
+
+  const recordType = RecordType.weekDtate
 
   const { uid } = useContext(AppContext)
 
@@ -101,6 +104,8 @@ export default function MyCenter() {
             <div className={[styles.inf, 'f-brk'].join(' ')}>{user?.profile.signature}</div>
           </div>
         </div>
+
+        <MyRecords records={userRecord} recordType={recordType} listenSongs={user?.listenSongs} />
 
         <div className={['wy-sec', styles.sheets].join(' ')}>
           <div className="u-title wy-sec-wrap clearfix">

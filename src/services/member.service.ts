@@ -34,7 +34,7 @@ export const getUserDetail = async (uid: string): Promise<User> => {
   return res.data
 }
 
-export const getUserRecord = async (uid: string, type = RecordType.allData): Promise<recordVal[]> => {
+export const getUserRecord = async (uid: string, type = RecordType.weekDtate): Promise<recordVal[]> => {
   const params = { uid: uid, type: type }
   const res = await API.get('/user/record', { params })
   return res.data[records[type]]
