@@ -47,6 +47,7 @@ const noDataTip = {
 }
 
 export default function MyRecords(props: MyRecordsProps) {
+
   const history = useHistory()
 
   const handleRouteJump = (id: number) => {
@@ -110,7 +111,7 @@ export default function MyRecords(props: MyRecordsProps) {
       <div className={[styles.uTitle, 'wy-sec-wrap', 'clearfix'].join(' ')}>
         <h3 className="wy-sec-tit"><span className="f-ff2">听歌排行</span></h3>
         <span className={[styles.sub, 's-fc3'].join(' ')}>
-          累计听歌{ }首
+          累计听歌{props.listenSongs ?? 0}首
         </span>
         <div className={[styles.more, 'tab-type'].join(' ')}>
           <span className={styles.active}>最近一周</span>

@@ -6,10 +6,8 @@ import { API } from "../utils/api";
 
 export enum RecordType {
   allData,
-  weekDtate
+  weekData
 }
-
-const records = ['allData', 'weekData']
 
 /**
  * problem:
@@ -34,10 +32,10 @@ export const getUserDetail = async (uid: string): Promise<User> => {
   return res.data
 }
 
-export const getUserRecord = async (uid: string, type = RecordType.weekDtate): Promise<recordVal[]> => {
+export const getUserRecord = async (uid: string, type = RecordType.weekData): Promise<recordVal[]> => {
   const params = { uid: uid, type: type }
   const res = await API.get('/user/record', { params })
-  return res.data[records[type]]
+  return res.data[RecordType[type]]
 }
 
 export const getUserSheets = async (uid: string): Promise<UserSheet> => {

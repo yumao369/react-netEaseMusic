@@ -8,20 +8,22 @@ import MyRecords from "../components/myRecords";
 import styles from "./index.module.less"
 
 export default function MyCenter() {
-
-  const recordType = RecordType.weekDtate
-
   const { uid } = useContext(AppContext)
 
   const [user, setUser] = useState<User | null>(null)
   const [userRecord, setUserRecord] = useState<recordVal[]>([])
   const [userSheet, setUserSheet] = useState<UserSheet | null>(null)
+  const [recordType, setRecordType] = useState<RecordType>(RecordType.weekData)
 
   useEffect(() => {
     getUDetail()
     getURecord()
     getUSheets()
   }, [])
+
+  useEffect(() => {
+
+  })
 
   const getUDetail = async () => {
     if (uid) {
@@ -106,6 +108,7 @@ export default function MyCenter() {
         </div>
 
         <MyRecords records={userRecord} recordType={recordType} listenSongs={user?.listenSongs} />
+        <a className={styles.lookMore}>查看更多&gt;</a>
 
         <div className={['wy-sec', styles.sheets].join(' ')}>
           <div className="u-title wy-sec-wrap clearfix">
