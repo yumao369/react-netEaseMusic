@@ -148,6 +148,12 @@ export function SingerDetailCom() {
               <h3 className="ellipsis">{singer?.artist.alias.join(';')}</h3>
             </div>
             <div className={styles.coverImg}>
+              {/**
+               * problem:
+               * when we click similar singer,the big picture of the singer will have a delay to display.
+               * status:
+               * NOT SOLVED
+               */}
               <img className="full-height" src={singer?.artist.picUrl} alt={singer?.artist.name} />
             </div>
             <button className={[styles.btn, styles.btnLike].join(' ')}></button>
