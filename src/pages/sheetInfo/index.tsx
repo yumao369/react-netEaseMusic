@@ -87,7 +87,6 @@ export default function SheetInfo() {
   }, [currentSong])
 
   const listenCurrent = () => {
-    console.log('currentsong', currentSong)
     if (currentSong) {
       const index = findIndex(sheetInfo?.tracks ?? [], currentSong)
       console.log('index', index)

@@ -2,8 +2,8 @@ import { Button, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import { useHistory, useParams } from "react-router-dom";
-import { getSingerDetail } from "../../services/singer.service";
-import { SingerDetail, Song } from "../../types/GlobalTypes";
+import { getSimilarSinger, getSingerDetail } from "../../services/singer.service";
+import { Singer, SingerDetail, Song } from "../../types/GlobalTypes";
 import styles from "./index.module.less"
 import { songTimeFormat } from "../../utils/timeFormat";
 import { useAppSelector } from "../../redux/hooks";
@@ -48,11 +48,13 @@ export function SingerDetailCom() {
   const history = useHistory()
 
   const [singer, setSinger] = useState<SingerDetail | null>(null)
+  const [similarSinger, setSimilarSinger] = useState<Singer[]>([])
 
   const currentSong = useAppSelector(selectCurrentSong)
 
   useEffect(() => {
     getSinger()
+    getSimiSinger()
   }, [params])
 
   const getSinger = async () => {
@@ -61,12 +63,17 @@ export function SingerDetailCom() {
     setSinger(singerDetail)
   }
 
+  const getSimiSinger = async () => {
+    const simiSinger = await getSimilarSinger(params.id)
+    console.log('simiSinger', simiSinger)
+    setSimilarSinger(simiSinger)
+  }
+
   const handleRouteJump = (id: number) => {
     history.push(`/songInfo/${id}`)
   }
 
   const addSongToList = async (song: Song, isPlay = false) => {
-    console.log('song', song)
     if (!currentSong || currentSong.id !== song.id) {
       const list = await getSongList(song)
       if (list.length) {
@@ -80,6 +87,10 @@ export function SingerDetailCom() {
     if (list.length) {
       insertSongs(list)
     }
+  }
+
+  const handleSimiSingerClickRouteJump = (id: number) => {
+    history.push(`/singer/${id}`)
   }
 
   const createTableData = () => {
@@ -114,6 +125,19 @@ export function SingerDetailCom() {
     })
   }
 
+  const renderSimilarSinger = () => {
+    return similarSinger.map(item => {
+      return (
+        <li key={item.id} onClick={() => { handleSimiSingerClickRouteJump(item.id) }}>
+          <div className={styles.pic}>
+            <img src={item.picUrl} alt={item.name} />
+          </div>
+          <p className='ellipsis'>{item.name}</p>
+        </li>
+      )
+    })
+  }
+
   return (
     <div className={[styles.singerDetail, 'wrap', 'feature-wrap', 'clearfix'].join(' ')}>
       <div className={styles.dtLeft}>
@@ -145,6 +169,15 @@ export function SingerDetailCom() {
           </div>
         </div>
       </div >
+
+      <div className={styles.dtRight}>
+        <div className={styles.rightWrap}>
+          <h3>相似歌手</h3>
+          <ul className="clearfix">
+            {renderSimilarSinger()}
+          </ul>
+        </div>
+      </div>
     </div>
   )
 } 

@@ -22,6 +22,7 @@ import { ModalTypes } from "./redux/memberSlice";
 import { getUserDetail, logout } from "./services/member.service";
 import { AppContext } from "./context/appContext";
 import MyCenter from "./pages/member/myCenter";
+import RecordDetail from "./pages/member/recordDetail";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -200,6 +201,7 @@ function App() {
             <Route path="/songInfo/:id" component={SongInfo} />
             <Route path="/singer/:id" component={SingerDetailCom} />
             <Route path="/member/:id" component={MyCenter} />
+            <Route path="/records/:id" component={RecordDetail} />
           </Content>
           <Footer className={styles.footer}>
             Ant Design ©2022 Implement By React

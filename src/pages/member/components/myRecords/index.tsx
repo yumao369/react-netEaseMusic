@@ -1,6 +1,8 @@
 import { Divider, Table } from "antd";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { useAppSelector } from "../../../../redux/hooks";
+import { selectCurrentSong } from "../../../../redux/playerSlice";
 import { RecordType } from "../../../../services/member.service";
 import { recordVal, Singer, Song } from "../../../../types/GlobalTypes";
 import { songTimeFormat } from "../../../../utils/timeFormat";
@@ -10,6 +12,9 @@ interface MyRecordsProps {
   records: recordVal[];
   recordType: RecordType;
   listenSongs: number | undefined;
+  handleTypeChange: (type: RecordType) => void;
+  currentIndex: number;
+  addSongToList: (song: Song, isPlay?: boolean) => Promise<void>
 }
 
 const myRecordsColumns = [
@@ -49,6 +54,7 @@ const noDataTip = {
 export default function MyRecords(props: MyRecordsProps) {
 
   const history = useHistory()
+  const currentSong = useAppSelector(selectCurrentSong)
 
   const handleRouteJump = (id: number) => {
     history.push(`/songInfo/${id}`)
@@ -77,7 +83,7 @@ export default function MyRecords(props: MyRecordsProps) {
         index: (
           <div className='first-col'>
             <span>{index + 1}</span>
-            <i className='ico'></i>
+            <i className={['ico', props.currentIndex === index ? 'current' : ''].join(' ')} onClick={() => { props.addSongToList(item.song, true) }}></i>
           </div>
         ),
         title: (
@@ -89,7 +95,7 @@ export default function MyRecords(props: MyRecordsProps) {
           <div className="time-col">
             <span>{songTimeFormat(item.song.dt / 1000)}</span>
             <p className="icons">
-              <i className="ico add" title="添加" ></i>
+              <i className="ico add" title="添加" onClick={() => { props.addSongToList(item.song) }}></i>
               <i className="ico like" title="收藏"></i>
               <i className="ico share" title="分享"></i>
             </p>
@@ -114,9 +120,9 @@ export default function MyRecords(props: MyRecordsProps) {
           累计听歌{props.listenSongs ?? 0}首
         </span>
         <div className={[styles.more, 'tab-type'].join(' ')}>
-          <span className={styles.active}>最近一周</span>
+          <span className={props.recordType === RecordType.weekData ? styles.active : ''} onClick={() => { props.handleTypeChange(RecordType.weekData) }}>最近一周</span>
           <Divider type="vertical" />
-          <span>所有时间</span>
+          <span className={props.recordType === RecordType.allData ? styles.active : ''} onClick={() => { props.handleTypeChange(RecordType.allData) }}>所有时间</span>
         </div>
       </div>
 

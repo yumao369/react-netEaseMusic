@@ -52,7 +52,6 @@ export function SongInfo() {
   }
 
   const addSongToList = async (song: Song | null, isPlay = false) => {
-    console.log('song', song)
     if (song) {
       if (!currentSong || currentSong.id !== song.id) {
         const list = await getSongList(song)

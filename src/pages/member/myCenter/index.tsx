@@ -1,29 +1,42 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import SingleSheet from "../../../components/wyUi/singleSheet";
 import { AppContext } from "../../../context/appContext";
-import { onPlaySheetBatch } from "../../../services/batchAction.service";
+import { useAppSelector } from "../../../redux/hooks";
+import { selectCurrentSong } from "../../../redux/playerSlice";
+import { insertSong, onPlaySheetBatch } from "../../../services/batchAction.service";
 import { getUserDetail, getUserRecord, getUserSheets, RecordType } from "../../../services/member.service";
-import { recordVal, User, UserSheet } from "../../../types/GlobalTypes";
+import { getSongList } from "../../../services/song.service";
+import { recordVal, Song, User, UserSheet } from "../../../types/GlobalTypes";
+import { findIndex } from "../../../utils/array";
 import MyRecords from "../components/myRecords";
 import styles from "./index.module.less"
 
 export default function MyCenter() {
   const { uid } = useContext(AppContext)
 
+  const history = useHistory()
+
   const [user, setUser] = useState<User | null>(null)
   const [userRecord, setUserRecord] = useState<recordVal[]>([])
   const [userSheet, setUserSheet] = useState<UserSheet | null>(null)
   const [recordType, setRecordType] = useState<RecordType>(RecordType.weekData)
+  const [currentIndex, setCurrentIndex] = useState<number>(-1)
+
+  const currentSong = useAppSelector(selectCurrentSong)
 
   useEffect(() => {
     getUDetail()
-    getURecord()
     getUSheets()
   }, [])
 
   useEffect(() => {
+    getURecord()
+  }, [recordType])
 
-  })
+  useEffect(() => {
+    listenCurrent()
+  }, [currentSong, userRecord])
 
   const getUDetail = async () => {
     if (uid) {
@@ -34,8 +47,8 @@ export default function MyCenter() {
 
   const getURecord = async () => {
     if (uid) {
-      const record = await getUserRecord(uid)
-      setUserRecord(record)
+      const record = await getUserRecord(uid, recordType)
+      setUserRecord(record.slice(0, 10))
     }
   }
 
@@ -48,6 +61,35 @@ export default function MyCenter() {
 
   const onPlaySheet = (id: number) => {
     onPlaySheetBatch(id)
+  }
+
+  const handleTypeChange = (type: RecordType) => {
+    setRecordType(type)
+  }
+
+  const listenCurrent = () => {
+    if (currentSong) {
+      const songs = userRecord.map(item => item.song)
+      const index = findIndex(songs, currentSong)
+      console.log('index', index)
+      setCurrentIndex(index)
+    }
+  }
+
+  const addSongToList = async (song: Song, isPlay = false) => {
+    console.log('song', song)
+    if (!currentSong || currentSong.id !== song.id) {
+      const list = await getSongList(song)
+      if (list.length) {
+        insertSong(list[0], isPlay)
+      }
+    }
+  }
+
+  const handleMoreRouteJump = (id: string | null | undefined) => {
+    if (uid) {
+      history.push(`/records/${id}`)
+    }
   }
 
   const renderMyCreate = () => {
@@ -107,8 +149,19 @@ export default function MyCenter() {
           </div>
         </div>
 
-        <MyRecords records={userRecord} recordType={recordType} listenSongs={user?.listenSongs} />
-        <a className={styles.lookMore}>查看更多&gt;</a>
+        <MyRecords records={userRecord} recordType={recordType} listenSongs={user?.listenSongs} handleTypeChange={handleTypeChange} currentIndex={currentIndex} addSongToList={addSongToList} />
+        {/**
+         * problem:
+         * 到这一页，一定是用户已经登录，本地存储了uid，所以uid一定是有值的，一定为number类型。
+         * 而目前，uid的类型还是number|null|undefined类型，这导致在这种用户必须登录访问的页面，
+         * 我们还需要判断uid是否存在，判断uid的类型，导致代码冗余，因为这些判断在进入这一页之前就
+         * 已经判断好了，所以我认为从这一页再进行跳转的页面不应该再去判断uid是否存在或者判断uid的
+         * 类型。
+         * status:
+         * NOT SOLVED
+         * 
+         */}
+        <a className={styles.lookMore} onClick={() => { handleMoreRouteJump(uid) }}>查看更多&gt;</a>
 
         <div className={['wy-sec', styles.sheets].join(' ')}>
           <div className="u-title wy-sec-wrap clearfix">
