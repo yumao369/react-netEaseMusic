@@ -11,12 +11,14 @@ export enum ModalTypes {
 
 export type MemberState = {
   modalVisible: boolean;
-  modalType: ModalTypes
+  modalType: ModalTypes;
+  likeId: string;
 }
 
 export const defaultState: MemberState = {
   modalVisible: false,
-  modalType: ModalTypes.Default
+  modalType: ModalTypes.Default,
+  likeId: ''
 }
 
 export const memberSlice = createSlice({
@@ -28,13 +30,17 @@ export const memberSlice = createSlice({
     },
     setModalType: (state, action: PayloadAction<{ modalType: ModalTypes }>) => {
       return { ...state, modalType: action.payload.modalType };
+    },
+    setLikeId: (state, action: PayloadAction<{ likeId: string }>) => {
+      return { ...state, likeId: action.payload.likeId }
     }
   }
 })
 
-export const { setModalVisible, setModalType } = memberSlice.actions
+export const { setModalVisible, setModalType, setLikeId } = memberSlice.actions
 
 export const selectModalVisible = (state: RootState) => state.memberReducer.modalVisible;
 export const selectModalType = (state: RootState) => state.memberReducer.modalType;
+export const selectLikeId = (state: RootState) => state.memberReducer.likeId;
 
 export default memberSlice.reducer

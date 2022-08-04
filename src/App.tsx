@@ -11,18 +11,20 @@ import { SongInfo } from "./pages/songInfo";
 import { SingerDetailCom } from "./pages/singerDetail";
 import WySearch from "./components/wyUi/wySearch";
 import { search } from "./services/search.service";
-import { SearchResult, User } from "./types/GlobalTypes";
+import { LikeSongParams, SearchResult, User, UserSheet } from "./types/GlobalTypes";
 import { isEmptyObject } from "./utils/tools";
 import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
 import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
 import WyLayerLogin from "./components/wyUi/wyLayer/wyLayerLogin";
 import WyLayerRegister from "./components/wyUi/wyLayer/wyLayerRegister";
-import { controlModal } from "./services/batchAction.service";
-import { ModalTypes } from "./redux/memberSlice";
-import { getUserDetail, logout } from "./services/member.service";
+import { controlModal, likeSong } from "./services/batchAction.service";
+import { ModalTypes, selectLikeId, setModalVisible } from "./redux/memberSlice";
+import { addLikeSong, createSheet, getUserDetail, getUserSheets, logout } from "./services/member.service";
 import { AppContext } from "./context/appContext";
 import MyCenter from "./pages/member/myCenter";
 import RecordDetail from "./pages/member/recordDetail";
+import WyLayerLike from "./components/wyUi/wyLayer/wyLayerLike";
+import { useAppDispatch, useAppSelector } from "./redux/hooks";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -39,27 +41,14 @@ const menu = [
   },
 ];
 
-function Member() {
+interface MemberProps {
+  uid: string | null | undefined;
+  onLogOut: (() => Promise<void>) | undefined;
+  user: User | null
+}
+
+function Member(props: MemberProps) {
   const history = useHistory()
-
-  const { onLogOut } = useContext(AppContext)
-  const { uid } = useContext(AppContext)
-
-  const [user, setUser] = useState<User | null>(null)
-
-  useEffect(() => {
-    getUDetail()
-  }, [uid])
-
-
-  const getUDetail = async () => {
-    if (uid) {
-      const user = await getUserDetail(uid)
-      setUser(user)
-    } else {
-      setUser(null)
-    }
-  }
 
   const handleLogin = () => {
     controlModal(true, ModalTypes.LoginByPhone)
@@ -70,18 +59,18 @@ function Member() {
   }
 
   const handleMyCenterRouteJump = () => {
-    history.push(`/member/${uid}`)
+    history.push(`/member/${props.uid}`)
   }
 
   return (
     <div className={styles.member}>
       {
-        user ? (
+        props.user ? (
           <div className={styles.login}>
             <Menu mode="horizontal" theme="dark">
               <SubMenu title={
                 <div>
-                  <Avatar src={user.profile.avatarUrl} />
+                  <Avatar src={props.user.profile.avatarUrl} />
                   <i><DownOutlined /></i>
                 </div>
               }
@@ -89,7 +78,7 @@ function Member() {
                 <Menu.Item icon={<MobileOutlined />} key={"sign up"} onClick={handleMyCenterRouteJump}>
                   个人中心
                 </Menu.Item>
-                <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={onLogOut}>
+                <Menu.Item icon={<UserAddOutlined />} key={"sign in"} onClick={props.onLogOut}>
                   登出
                 </Menu.Item>
               </SubMenu>
@@ -117,12 +106,77 @@ function Member() {
 
 function App() {
 
+  const dispatch = useAppDispatch()
+
+  const { onLogOut } = useContext(AppContext)
+  const { uid } = useContext(AppContext)
+
   const [searchInput, setSearchInput] = useState<string>('')
   const [searchResult, setSearchResult] = useState<SearchResult>({})
+  const [user, setUser] = useState<User | null>(null)
+  const [userSheet, setUserSheet] = useState<UserSheet | null>(null)
+
+  const likeId = useAppSelector(selectLikeId)
+
+  useEffect(() => {
+    getUDetail()
+  }, [uid])
 
   useEffect(() => {
     onSearch()
   }, [searchInput])
+
+  const openModal = (type: ModalTypes) => {
+    controlModal(true, type)
+  }
+
+  const getUDetail = async () => {
+    if (uid) {
+      const user = await getUserDetail(uid)
+      setUser(user)
+    } else {
+      setUser(null)
+    }
+  }
+
+  const loadMySheets = async () => {
+    if (user) {
+      const sheets = await getUserSheets(user.profile.userId.toString())
+      setUserSheet(sheets)
+      dispatch(setModalVisible({ modalVisible: true }))
+    } else {
+      openModal(ModalTypes.Default)
+    }
+  }
+
+  const onLikeSong = async (args: LikeSongParams) => {
+    const res = await addLikeSong(args)
+    /**
+     * problem:
+     * the code below can be encapsulated as a function
+     * which is responsible for handling the response 
+     * form server.
+     * status:
+     * NOT SOLVED
+     */
+    if (res.code !== 200) {
+      message.error(`${res.msg || '登录失败'}`)
+    } else {
+      controlModal(false)
+      message.success('收藏成功')
+    }
+  }
+
+  const onCreateSheet = async (sheetName: string) => {
+    const res = await createSheet(sheetName)
+    console.log('res', res)
+    if (res.code !== 200) {
+      message.error(`${res.msg || '创建失败'}`)
+    } else {
+      message.success('创建成功')
+      onLikeSong({ pid: res.id, tracks: likeId })
+    }
+  }
 
   const onSearch = async () => {
     if (searchInput) {
@@ -185,7 +239,7 @@ function App() {
               </div>
               <div className={styles.right}>
                 <WySearch getSearchInput={getSearchInput} searchResult={searchResult} />
-                <Member />
+                <Member uid={uid} user={user} onLogOut={onLogOut} />
               </div>
             </div>
           </Header>
@@ -209,7 +263,13 @@ function App() {
         </Layout>
       </div>
       <WyPlayer />
-      <WyLayerModal default={<WyLayerDefault />} login={<WyLayerLogin />} register={<WyLayerRegister />} />
+      <WyLayerModal
+        loadMySheets={loadMySheets}
+        default={<WyLayerDefault />}
+        login={<WyLayerLogin />}
+        register={<WyLayerRegister />}
+        like={<WyLayerLike likeId={likeId} sheet={userSheet} onLikeSong={onLikeSong} onCreateSheet={onCreateSheet} />}
+      />
     </Router>
   );
 }

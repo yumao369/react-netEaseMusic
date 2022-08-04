@@ -60,6 +60,7 @@ export type SongSheet = {
   commentCount: number;
   subscribed: boolean;
   tracks: Song[];
+  trackCount: number;
 };
 
 export type SongUrl = {
@@ -159,6 +160,15 @@ export type UserRecord = {
 export type UserSheet = {
   self: SongSheet[],
   subscribed: SongSheet[]
+}
+
+export type LikeSongParams = {
+  pid: string;
+  tracks: string;
+}
+
+export type CreateSheetResponse = {
+  id: string
 }
 
 export type AnyJson = {

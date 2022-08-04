@@ -9,11 +9,14 @@ import { ModalTypes, selectModalType, selectModalVisible, setModalVisible } from
 import { useSpring, animated } from "react-spring";
 import { Transition, TransitionStatus } from 'react-transition-group';
 import { switchExpr } from "../../../../common/functions";
+import { controlModal } from "../../../../services/batchAction.service";
 
 interface WyLayerModalProps {
   default: React.ReactNode,
   login: React.ReactNode,
-  register: React.ReactNode
+  register: React.ReactNode,
+  like: React.ReactNode,
+  loadMySheets: () => Promise<void>
 }
 
 const duration = 300
@@ -84,8 +87,24 @@ export default function WyLayerModal(props: WyLayerModalProps) {
   const visible = useAppSelector(selectModalVisible)
   const modalType = useAppSelector(selectModalType)
 
+  useEffect(() => {
+    watchModalType()
+  }, [modalType])
+
+  /**
+   * problem:
+   * 这个地方可以使用js设计模式的策略模式进行优化
+   * status:
+   * NOT SOLVED
+   */
+  const watchModalType = () => {
+    if (modalType === ModalTypes.Like) {
+      props.loadMySheets()
+    }
+  }
+
   const handleClose = () => {
-    dispatch(setModalVisible({ modalVisible: false }))
+    controlModal(false)
   }
 
   const renderBackDrop = (props: RenderModalBackdropProps) => {
@@ -120,6 +139,7 @@ export default function WyLayerModal(props: WyLayerModalProps) {
             switchExpr(modalType)
               .caseIs(ModalTypes.LoginByPhone, props.login)
               .caseIs(ModalTypes.Register, props.register)
+              .caseIs(ModalTypes.Like, props.like)
               .defaultAs(props.default)
           }
           <div className={styles.zcls} title="关闭" onClick={handleClose}></div>

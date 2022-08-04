@@ -1,7 +1,7 @@
 
 import { AxiosError, AxiosResponse } from "axios";
 import { ValueForm } from "../components/wyUi/wyLayer/wyLayerLogin";
-import { BaseResponse, AnyJson, User, Signin, recordVal, UserSheet, SongSheet } from "../types/GlobalTypes";
+import { BaseResponse, AnyJson, User, Signin, recordVal, UserSheet, SongSheet, LikeSongParams, CreateSheetResponse } from "../types/GlobalTypes";
 import { API } from "../utils/api";
 
 export enum RecordType {
@@ -54,9 +54,45 @@ export const logout = async (): Promise<AnyJson & BaseResponse> => {
   return res.data
 }
 
+/**
+ * problem:
+ * code below can be encapsulated as a function to handle axios request.
+ * status:
+ * NOT SOLVED
+ */
 export const signin = async (): Promise<Signin & BaseResponse> => {
   const params = { type: 1 }
   const res = await API.get('/daily_signin', { params }).then((resp: AxiosResponse) => {
+    return resp.data
+  }).catch((err: AxiosError) => {
+    return err.response?.data
+  })
+  return res
+}
+
+export const addLikeSong = async ({ pid, tracks }: LikeSongParams): Promise<BaseResponse> => {
+  const params = { pid, tracks, op: 'add' }
+  const res = await API.get('/playlist/tracks', { params }).then((resp: AxiosResponse) => {
+    return resp.data
+  }).catch((err: AxiosError) => {
+    return err.response?.data
+  })
+  return res
+}
+
+export const createSheet = async (name: string): Promise<CreateSheetResponse & BaseResponse> => {
+  const params = { name: name }
+  const res = await API.get('/playlist/create', { params }).then((resp: AxiosResponse) => {
+    return resp.data
+  }).catch((err: AxiosError) => {
+    return err.response?.data
+  })
+  return res
+}
+
+export const likeSheet = async (id: string, t = 1): Promise<BaseResponse> => {
+  const params = { id, t }
+  const res = await API.get('/playlist/subscribe', { params }).then((resp: AxiosResponse) => {
     return resp.data
   }).catch((err: AxiosError) => {
     return err.response?.data

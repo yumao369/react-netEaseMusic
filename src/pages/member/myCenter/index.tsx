@@ -176,7 +176,7 @@ export default function MyCenter() {
           </div>
         </div >
 
-        <div className="wy-sec sheets">
+        <div className={['wy-sec', styles.sheets].join(' ')}>
           <div className="u-title wy-sec-wrap clearfix">
             <h3 className="wy-sec-tit">
               <span className="f-ff2">我收藏的歌单</span>

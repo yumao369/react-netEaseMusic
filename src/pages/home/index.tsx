@@ -28,6 +28,7 @@ import { useHistory } from "react-router-dom";
 import { controlModal } from "../../services/batchAction.service";
 import { AppContext } from "../../context/appContext";
 import { getUserDetail } from "../../services/member.service";
+import { ModalTypes } from "../../redux/memberSlice";
 
 export default function Home() {
   const { uid } = useContext(AppContext)
@@ -134,7 +135,7 @@ export default function Home() {
   }
 
   const openModal = () => {
-    controlModal()
+    controlModal(true, ModalTypes.Default)
   }
 
   const renderCarouselItem = () => {

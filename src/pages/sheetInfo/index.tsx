@@ -5,12 +5,14 @@ import { Control, Singer, Song, SongSheet } from "../../types/GlobalTypes";
 import { songTimeFormat, timeFormat } from "../../utils/timeFormat";
 import { PlayCircleOutlined, UpOutlined, DownOutlined } from "@ant-design/icons";
 import styles from "./index.module.less"
-import { Button, Table, Tag } from "antd";
+import { Button, message, Table, Tag } from "antd";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentSong } from "../../redux/playerSlice";
 import { findIndex } from "../../utils/array";
 import { getSongList } from "../../services/song.service";
-import { insertSong, insertSongs, onPlaySheetBatch } from "../../services/batchAction.service";
+import { controlModal, insertSong, insertSongs, likeSong, onPlaySheetBatch } from "../../services/batchAction.service";
+import { ModalTypes } from "../../redux/memberSlice";
+import { likeSheet } from "../../services/member.service";
 
 interface SheetInfoParams {
   id: string
@@ -96,6 +98,7 @@ export default function SheetInfo() {
 
   const getSongSheetInfo = async () => {
     const sheetInfo = await getSongSheetDetail(Number(params.id))
+    console.log('sheetinfo', sheetInfo)
     setSheetInfo(sheetInfo)
   }
 
@@ -148,6 +151,21 @@ export default function SheetInfo() {
     history.push(`/songInfo/${id}`)
   }
 
+  const handleLikeSongClick = (id: string) => {
+    likeSong(id)
+  }
+
+  const handleLikeSheetClick = async (id: number | undefined) => {
+    if (id) {
+      const res = await likeSheet(id.toString())
+      if (res.code !== 200) {
+        message.error(`${res.msg || '收藏失败'}`)
+      } else {
+        message.success('收藏成功')
+      }
+    }
+  }
+
   const renderTags = () => {
     return sheetInfo?.tags.map((item, index) => {
       return <Tag className={styles.tagItem} key={index}>{item}</Tag>
@@ -186,7 +204,7 @@ export default function SheetInfo() {
             <span>{songTimeFormat(item.dt / 1000)}</span>
             <p className="icons">
               <i className="ico add" title="添加" onClick={() => { addSongToList(item) }}></i>
-              <i className="ico like" title="收藏"></i>
+              <i className="ico like" title="收藏" onClick={() => { handleLikeSongClick(item.id.toString()) }}></i>
               <i className="ico share" title="分享"></i>
             </p>
           </div >
@@ -236,7 +254,7 @@ export default function SheetInfo() {
                   </Button>
                   <Button className={styles.add} type="primary" onClick={() => { addSongsToList(sheetInfo?.tracks ?? []) }}>+</Button>
                 </Button.Group>
-                <Button className={[styles.btn, styles.like].join(' ')}>
+                <Button className={[styles.btn, styles.like].join(' ')} onClick={() => { handleLikeSheetClick(sheetInfo?.id) }} disabled={sheetInfo?.subscribed}>
                   <span>收藏</span>({sheetInfo?.subscribedCount})
                 </Button>
                 <Button className={[styles.btn, styles.share].join(' ')}>
