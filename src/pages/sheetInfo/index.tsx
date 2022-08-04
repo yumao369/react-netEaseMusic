@@ -84,21 +84,18 @@ export default function SheetInfo() {
   }, [sheetInfo])
 
   useEffect(() => {
-    console.log(currentSong)
     listenCurrent()
   }, [currentSong])
 
   const listenCurrent = () => {
     if (currentSong) {
       const index = findIndex(sheetInfo?.tracks ?? [], currentSong)
-      console.log('index', index)
       setCurrentIndex(index)
     }
   }
 
   const getSongSheetInfo = async () => {
     const sheetInfo = await getSongSheetDetail(Number(params.id))
-    console.log('sheetinfo', sheetInfo)
     setSheetInfo(sheetInfo)
   }
 
@@ -131,7 +128,6 @@ export default function SheetInfo() {
   }
 
   const addSongToList = async (song: Song, isPlay = false) => {
-    console.log('song', song)
     if (!currentSong || currentSong.id !== song.id) {
       const list = await getSongList(song)
       if (list.length) {

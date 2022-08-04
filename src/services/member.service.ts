@@ -3,6 +3,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { ValueForm } from "../components/wyUi/wyLayer/wyLayerLogin";
 import { BaseResponse, AnyJson, User, Signin, recordVal, UserSheet, SongSheet, LikeSongParams, CreateSheetResponse } from "../types/GlobalTypes";
 import { API } from "../utils/api";
+import { get } from "../utils/requestUtils";
 
 export enum RecordType {
   allData,
@@ -70,7 +71,9 @@ export const signin = async (): Promise<Signin & BaseResponse> => {
   return res
 }
 
-export const addLikeSong = async ({ pid, tracks }: LikeSongParams): Promise<BaseResponse> => {
+/**
+ * 
+ * export const addLikeSong = async ({ pid, tracks }: LikeSongParams): Promise<BaseResponse> => {
   const params = { pid, tracks, op: 'add' }
   const res = await API.get('/playlist/tracks', { params }).then((resp: AxiosResponse) => {
     return resp.data
@@ -79,8 +82,10 @@ export const addLikeSong = async ({ pid, tracks }: LikeSongParams): Promise<Base
   })
   return res
 }
+ */
 
-export const createSheet = async (name: string): Promise<CreateSheetResponse & BaseResponse> => {
+/**
+ * export const createSheet = async (name: string): Promise<CreateSheetResponse & BaseResponse> => {
   const params = { name: name }
   const res = await API.get('/playlist/create', { params }).then((resp: AxiosResponse) => {
     return resp.data
@@ -89,8 +94,10 @@ export const createSheet = async (name: string): Promise<CreateSheetResponse & B
   })
   return res
 }
+ */
 
-export const likeSheet = async (id: string, t = 1): Promise<BaseResponse> => {
+/**
+ * export const likeSheet = async (id: string, t = 1): Promise<BaseResponse> => {
   const params = { id, t }
   const res = await API.get('/playlist/subscribe', { params }).then((resp: AxiosResponse) => {
     return resp.data
@@ -98,4 +105,17 @@ export const likeSheet = async (id: string, t = 1): Promise<BaseResponse> => {
     return err.response?.data
   })
   return res
+}
+ */
+
+export const addLikeSong = <T>({ pid, tracks }: LikeSongParams) => {
+  return get<T>('/playlist/tracks', { pid, tracks })
+}
+
+export const createSheet = <T>(name: string) => {
+  return get<T>('/playlist/create', { name })
+}
+
+export const likeSheet = <T>(id: string, t = 1) => {
+  return get<T>('/playlist/subscribe', { id, t })
 }

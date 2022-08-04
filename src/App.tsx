@@ -11,7 +11,7 @@ import { SongInfo } from "./pages/songInfo";
 import { SingerDetailCom } from "./pages/singerDetail";
 import WySearch from "./components/wyUi/wySearch";
 import { search } from "./services/search.service";
-import { LikeSongParams, SearchResult, User, UserSheet } from "./types/GlobalTypes";
+import { CreateSheetResponse, LikeSongParams, SearchResult, User, UserSheet } from "./types/GlobalTypes";
 import { isEmptyObject } from "./utils/tools";
 import WyLayerModal from "./components/wyUi/wyLayer/wyLayerModal";
 import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
@@ -168,7 +168,7 @@ function App() {
   }
 
   const onCreateSheet = async (sheetName: string) => {
-    const res = await createSheet(sheetName)
+    const res = await createSheet<CreateSheetResponse>(sheetName)
     console.log('res', res)
     if (res.code !== 200) {
       message.error(`${res.msg || '创建失败'}`)
