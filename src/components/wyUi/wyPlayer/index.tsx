@@ -4,12 +4,14 @@ import { fromEvent, Subscription } from "rxjs";
 import { formatTime } from "../../../functions/formatTime";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { selectCurrentIndex, selectCurrentSong, selectPlayList, selectPlayMode, selectSongList, setCurrentIndex, setPlayList, setPlayMode, setSongList } from "../../../redux/playerSlice";
-import { PlayMode, Song } from "../../../types/GlobalTypes";
+import { PlayMode, Singer, Song } from "../../../types/GlobalTypes";
 import { findIndex, shuffle } from "../../../utils/array";
 import WySlider from "../wySlider";
 import styles from "./index.module.less"
 import WyPlayerPanel, { WyPlayerPanelRef } from "./wyPlayerPanel";
 import { useSpring, animated } from 'react-spring'
+import { likeSong } from "../../../services/batchAction.service";
+import { setShareInfo } from "../../../redux/memberSlice";
 
 const modeTypes: PlayMode[] = [
   {
@@ -253,6 +255,20 @@ export default function WyPlayer() {
     setLock(!lock)
   }
 
+  const handleLikeSong = (id: string) => {
+    likeSong(id)
+  }
+
+  const handleShareSong = (resource: Song, type = 'song') => {
+    const txt = makeTxt('歌曲', resource.name, resource.ar)
+    dispatch(setShareInfo({ shareInfo: { id: resource.id.toString(), type, txt } }))
+  }
+
+  const makeTxt = (type: string, name: string, makeBy: Singer[]): string => {
+    const makeByStr = makeBy.map(item => item.name).join('/')
+    return `${type}: ${name} -- ${makeByStr}`
+  }
+
   const renderAuthor = () => {
     const length = currentSong?.ar.length
     return currentSong?.ar.map((item, index) => {
@@ -304,8 +320,8 @@ export default function WyPlayer() {
           </div>
 
           <div className={styles.oper}>
-            <i className={[styles.like, styles.operCommon].join(' ')} title="收藏"></i>
-            <i className={[styles.share, styles.operCommon].join(' ')} title="分享"></i>
+            <i className={[styles.like, styles.operCommon].join(' ')} title="收藏" onClick={() => { handleLikeSong(currentSong.id.toString()) }}></i>
+            <i className={[styles.share, styles.operCommon].join(' ')} title="分享" onClick={() => { handleShareSong(currentSong) }}></i>
           </div>
           <div className={styles.ctrl}>
             <i className={[styles.volume, styles.ctrlCommon].join(' ')} title="音量" onClick={toggleVolPanel}></i>
@@ -327,7 +343,10 @@ export default function WyPlayer() {
             onChangeSong={onChangeSong}
             onClose={onCloseListPanel}
             onDeleteSong={onDeleteSong}
-            onClearSong={onClearSong} />
+            onClearSong={onClearSong}
+            onLikeSong={handleLikeSong}
+            onShareSong={handleShareSong}
+          />
         </div>
       </div>
 

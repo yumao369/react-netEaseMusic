@@ -188,7 +188,7 @@ function App() {
     const res = await shareResource(arg)
     console.log('res', res)
     if (res.code !== 200) {
-      message.error(`${res.msg || '分享失败'}`)
+      message.error(`${res.message || '分享失败'}`)
     } else {
       controlModal(false)
       message.success('分享成功')

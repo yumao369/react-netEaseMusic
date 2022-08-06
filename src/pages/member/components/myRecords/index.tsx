@@ -14,7 +14,9 @@ interface MyRecordsProps {
   listenSongs: number | undefined;
   handleTypeChange: (type: RecordType) => void;
   currentIndex: number;
-  addSongToList: (song: Song, isPlay?: boolean) => Promise<void>
+  addSongToList: (song: Song, isPlay?: boolean) => Promise<void>;
+  onLikeSong: (id: string) => void;
+  onShareSong: (resource: Song) => void
 }
 
 const myRecordsColumns = [
@@ -96,8 +98,8 @@ export default function MyRecords(props: MyRecordsProps) {
             <span>{songTimeFormat(item.song.dt / 1000)}</span>
             <p className="icons">
               <i className="ico add" title="添加" onClick={() => { props.addSongToList(item.song) }}></i>
-              <i className="ico like" title="收藏"></i>
-              <i className="ico share" title="分享"></i>
+              <i className="ico like" title="收藏" onClick={() => { props.onLikeSong(item.song.id.toString()) }}></i>
+              <i className="ico share" title="分享" onClick={() => { props.onShareSong(item.song) }}></i>
             </p>
           </div >
         ),

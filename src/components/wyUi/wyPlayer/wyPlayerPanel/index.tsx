@@ -19,6 +19,8 @@ interface WyPlayerPanelProps {
   onClose: () => void;
   onDeleteSong: (song: Song) => void;
   onClearSong: () => void;
+  onLikeSong: (id: string) => void;
+  onShareSong: (resource: Song) => void
 }
 
 export interface WyPlayerPanelRef {
@@ -203,8 +205,8 @@ const WyPlayerPanel: ForwardRefRenderFunction<WyPlayerPanelRef, WyPlayerPanelPro
           <i className={[styles.col, styles.arrow].join(' ')}></i>
           <div className={[styles.col, styles.name, styles.ellipsis].join(' ')}>{item.name}</div>
           <div className={[styles.col, styles.icons].join(' ')}>
-            <i className={[styles.ico, styles.like].join(' ')} title="收藏"></i>
-            <i className={[styles.ico, styles.share].join(' ')} title="分享"></i>
+            <i className={[styles.ico, styles.like].join(' ')} title="收藏" onClick={() => { props.onLikeSong(item.id.toString()) }}></i>
+            <i className={[styles.ico, styles.share].join(' ')} title="分享" onClick={() => { props.onShareSong(item) }}></i>
             <i className={[styles.ico, styles.trush].join(' ')} title="删除" onClick={(e) => { handleOnClickDeleteSong(e, item) }}></i>
           </div>
           <div className={[styles.singers, styles.clearfix, styles.ellipsis].join(' ')} key={item.id}>

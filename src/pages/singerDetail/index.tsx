@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Button, message, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import { useHistory, useParams } from "react-router-dom";
@@ -6,10 +6,12 @@ import { getSimilarSinger, getSingerDetail } from "../../services/singer.service
 import { Singer, SingerDetail, Song } from "../../types/GlobalTypes";
 import styles from "./index.module.less"
 import { songTimeFormat } from "../../utils/timeFormat";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentSong } from "../../redux/playerSlice";
 import { getSongList } from "../../services/song.service";
-import { insertSong, insertSongs } from "../../services/batchAction.service";
+import { insertSong, insertSongs, likeSong } from "../../services/batchAction.service";
+import { setShareInfo } from "../../redux/memberSlice";
+import { likeSinger, LikeSingerType } from "../../services/member.service";
 
 interface SingerDetailParams {
   id: string
@@ -49,8 +51,11 @@ export function SingerDetailCom() {
 
   const [singer, setSinger] = useState<SingerDetail | null>(null)
   const [similarSinger, setSimilarSinger] = useState<Singer[]>([])
+  const [hasLiked, setHasLiked] = useState<boolean>(false)
 
   const currentSong = useAppSelector(selectCurrentSong)
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     getSinger()
@@ -93,6 +98,52 @@ export function SingerDetailCom() {
     history.push(`/singer/${id}`)
   }
 
+  const handleLikeSongsClick = (songs: Song[] | undefined) => {
+    if (songs) {
+      const ids = songs.map(item => item.id).join(',')
+      handleLikeSongClick(ids)
+    }
+  }
+
+  const handleLikeSongClick = (id: string | undefined) => {
+    if (id) {
+      likeSong(id)
+    }
+  }
+
+  const handleShareSongClick = (resource: Song | null, type = 'song') => {
+    if (resource) {
+      const txt = makeTxt('歌曲', resource.name, resource.ar)
+      dispatch(setShareInfo({ shareInfo: { id: resource.id.toString(), type, txt } }))
+    }
+  }
+
+  const makeTxt = (type: string, name: string, makeBy: Singer[]): string => {
+    const makeByStr = makeBy.map(item => item.name).join('/')
+    return `${type}: ${name} -- ${makeByStr}`
+  }
+
+  const handleLikeSingerClick = async (id: string | undefined) => {
+    if (id) {
+      if (!hasLiked) {
+        handleLikeSinger(id, LikeSingerType.sub)
+      } else {
+        handleLikeSinger(id, LikeSingerType.unsub)
+      }
+    }
+  }
+
+  const handleLikeSinger = async (id: string, t: LikeSingerType) => {
+    const res = await likeSinger(id, t)
+    if (res.code !== 200) {
+      message.error(`${res.message || t === LikeSingerType.sub ? '收藏失败' : '取消收藏失败'}`)
+    } else {
+      message.success(t === LikeSingerType.sub ? '收藏成功' : '取消收藏成功')
+      setHasLiked(!hasLiked)
+    }
+  }
+
+
   const createTableData = () => {
     return singer?.hotSongs.map((item, index) => {
       return {
@@ -113,8 +164,8 @@ export function SingerDetailCom() {
             <span>{songTimeFormat(item.dt / 1000)}</span>
             <p className="icons">
               <i className="ico add" title="添加" ></i>
-              <i className="ico like" title="收藏"></i>
-              <i className="ico share" title="分享"></i>
+              <i className="ico like" title="收藏" onClick={() => { handleLikeSongClick(item.id.toString()) }}></i>
+              <i className="ico share" title="分享" onClick={() => { handleShareSongClick(item) }}></i>
             </p>
           </div >
         ),
@@ -156,7 +207,7 @@ export function SingerDetailCom() {
                */}
               <img className="full-height" src={singer?.artist.picUrl} alt={singer?.artist.name} />
             </div>
-            <button className={[styles.btn, styles.btnLike].join(' ')}></button>
+            <button className={[styles.btn, styles.btnLike, hasLiked ? styles.btnLiked : ''].join(' ')} onClick={() => { handleLikeSingerClick(singer?.artist.id.toString()) }}></button>
           </div>
 
           <div className={styles.top50}>
@@ -167,8 +218,8 @@ export function SingerDetailCom() {
                 </Button>
                 <Button className={styles.add} type="primary"  >+</Button>
               </Button.Group>
-              <Button className={[styles.btn, styles.like].join(' ')}>
-                <span>收藏</span>
+              <Button className={[styles.btn, styles.like].join(' ')} onClick={() => { handleLikeSongsClick(singer?.hotSongs) }}>
+                <span>收藏</span>{singer?.hotSongs.length}
               </Button>
             </div>
             <Table className="wy-table" columns={singerTableColumns} dataSource={createTableData()} locale={noDataTip} pagination={false} bordered />

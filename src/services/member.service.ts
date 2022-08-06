@@ -16,6 +16,11 @@ export type ShareParams = {
   type: string;
 }
 
+export enum LikeSingerType {
+  sub = 1,
+  unsub = 2
+}
+
 /**
  * problem:
  * Need to unify the processing logic of axios and add baseresponse
@@ -128,4 +133,8 @@ export const likeSheet = <T>(id: string, t = 1) => {
 
 export const shareResource = <T>({ id, msg, type }: ShareParams) => {
   return get<T>('share/resource', { id, msg, type })
+}
+
+export const likeSinger = <T>(id: string, t: LikeSingerType) => {
+  return get<T>('artist/sub', { id, t })
 }

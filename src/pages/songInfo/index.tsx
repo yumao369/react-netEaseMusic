@@ -6,9 +6,10 @@ import { Button } from "antd";
 import { getLyric, getSongDetail, getSongList } from "../../services/song.service";
 import { Control, Lyric, Singer, Song } from "../../types/GlobalTypes";
 import { BaseLyricLine, WyLyric } from "../../components/wyUi/wyPlayer/wyPlayerPanel/lyric";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentSong } from "../../redux/playerSlice";
-import { insertSong } from "../../services/batchAction.service";
+import { insertSong, likeSong } from "../../services/batchAction.service";
+import { setShareInfo } from "../../redux/memberSlice";
 
 interface SongInfoParams {
   id: string
@@ -27,6 +28,8 @@ export function SongInfo() {
   const [controlLyric, setControlLyric] = useState<Control>(initControlLyric)
 
   const currentSong = useAppSelector(selectCurrentSong)
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     getSong()
@@ -60,6 +63,24 @@ export function SongInfo() {
         }
       }
     }
+  }
+
+  const handleLikeSongClick = (id: string | undefined) => {
+    if (id) {
+      likeSong(id)
+    }
+  }
+
+  const handleShareSongClick = (resource: Song | null, type = 'song') => {
+    if (resource) {
+      const txt = makeTxt('歌曲', resource.name, resource.ar)
+      dispatch(setShareInfo({ shareInfo: { id: resource.id.toString(), type, txt } }))
+    }
+  }
+
+  const makeTxt = (type: string, name: string, makeBy: Singer[]): string => {
+    const makeByStr = makeBy.map(item => item.name).join('/')
+    return `${type}: ${name} -- ${makeByStr}`
   }
 
   const renderSingers = (singers: Singer[]) => {
@@ -123,10 +144,10 @@ export function SongInfo() {
                   </Button>
                   <Button className={styles.add} type="primary" onClick={() => { addSongToList(songInfo) }} >+</Button>
                 </Button.Group>
-                <Button className={[styles.btn, styles.like].join(' ')}>
+                <Button className={[styles.btn, styles.like].join(' ')} onClick={() => { handleLikeSongClick(songInfo?.id.toString()) }}>
                   <span>收藏</span>
                 </Button>
-                <Button className={[styles.btn, styles.share].join(' ')}>
+                <Button className={[styles.btn, styles.share].join(' ')} onClick={() => { handleShareSongClick(songInfo) }}>
                   <span>分享</span>
                 </Button>
               </div>

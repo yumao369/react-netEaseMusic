@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../../context/appContext";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { setShareInfo } from "../../../redux/memberSlice";
 import { selectCurrentSong } from "../../../redux/playerSlice";
-import { insertSong } from "../../../services/batchAction.service";
+import { insertSong, likeSong } from "../../../services/batchAction.service";
 import { getUserDetail, getUserRecord, RecordType } from "../../../services/member.service";
 import { getSongList } from "../../../services/song.service";
-import { recordVal, Song, User } from "../../../types/GlobalTypes";
+import { recordVal, Singer, Song, User } from "../../../types/GlobalTypes";
 import { findIndex } from "../../../utils/array";
 import MyRecords from "../components/myRecords";
 import styles from "./index.module.less"
@@ -19,6 +20,8 @@ export default function RecordDetail() {
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
 
   const currentSong = useAppSelector(selectCurrentSong)
+
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     getUDetail()
@@ -72,10 +75,41 @@ export default function RecordDetail() {
     }
   }
 
+  /**
+   * 问题：
+   * 分享和收藏这两个功能在sheetInfo,player,playerPanel,songInfo,record,singerDetail几个组件中都有，
+   * 并且逻辑都差不多，所以这段逻辑最好分装成一段代码，在需要的地方调用即可。
+   * status:
+   * NOT SOLVED
+   */
+
+  const handleLikeSong = (id: string) => {
+    likeSong(id)
+  }
+
+  const handleShareSong = (resource: Song, type = 'song') => {
+    const txt = makeTxt('歌曲', resource.name, resource.ar)
+    dispatch(setShareInfo({ shareInfo: { id: resource.id.toString(), type, txt } }))
+  }
+
+  const makeTxt = (type: string, name: string, makeBy: Singer[]): string => {
+    const makeByStr = makeBy.map(item => item.name).join('/')
+    return `${type}: ${name} -- ${makeByStr}`
+  }
+
   return (
     <div className={[styles.recordDetail, 'wrap', 'feature-wrap'].join(' ')}>
       <div className={styles.pageWrap}>
-        <MyRecords records={userRecord} recordType={recordType} listenSongs={user?.listenSongs} handleTypeChange={handleTypeChange} currentIndex={currentIndex} addSongToList={addSongToList} />
+        <MyRecords
+          records={userRecord}
+          recordType={recordType}
+          listenSongs={user?.listenSongs}
+          handleTypeChange={handleTypeChange}
+          currentIndex={currentIndex}
+          addSongToList={addSongToList}
+          onLikeSong={handleLikeSong}
+          onShareSong={handleShareSong}
+        />
       </div>
     </div>
   )
