@@ -10,6 +10,12 @@ export enum RecordType {
   weekData
 }
 
+export type ShareParams = {
+  id: string;
+  msg: string;
+  type: string;
+}
+
 /**
  * problem:
  * Need to unify the processing logic of axios and add baseresponse
@@ -118,4 +124,8 @@ export const createSheet = <T>(name: string) => {
 
 export const likeSheet = <T>(id: string, t = 1) => {
   return get<T>('/playlist/subscribe', { id, t })
+}
+
+export const shareResource = <T>({ id, msg, type }: ShareParams) => {
+  return get<T>('share/resource', { id, msg, type })
 }

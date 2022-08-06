@@ -18,13 +18,14 @@ import WyLayerDefault from "./components/wyUi/wyLayer/wyLayerDefault";
 import WyLayerLogin from "./components/wyUi/wyLayer/wyLayerLogin";
 import WyLayerRegister from "./components/wyUi/wyLayer/wyLayerRegister";
 import { controlModal, likeSong } from "./services/batchAction.service";
-import { ModalTypes, selectLikeId, setModalVisible } from "./redux/memberSlice";
-import { addLikeSong, createSheet, getUserDetail, getUserSheets, logout } from "./services/member.service";
+import { ModalTypes, selectLikeId, selectShareInfo, setModalVisible, ShareInfo } from "./redux/memberSlice";
+import { addLikeSong, createSheet, getUserDetail, getUserSheets, logout, ShareParams, shareResource } from "./services/member.service";
 import { AppContext } from "./context/appContext";
 import MyCenter from "./pages/member/myCenter";
 import RecordDetail from "./pages/member/recordDetail";
 import WyLayerLike from "./components/wyUi/wyLayer/wyLayerLike";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
+import WyLayerShare from "./components/wyUi/wyLayer/wyLayerShare";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -117,10 +118,15 @@ function App() {
   const [userSheet, setUserSheet] = useState<UserSheet | null>(null)
 
   const likeId = useAppSelector(selectLikeId)
+  const shareInfo = useAppSelector(selectShareInfo)
 
   useEffect(() => {
     getUDetail()
   }, [uid])
+
+  useEffect(() => {
+    watchShareInfo()
+  }, [shareInfo])
 
   useEffect(() => {
     onSearch()
@@ -178,12 +184,33 @@ function App() {
     }
   }
 
+  const onShare = async (arg: ShareParams) => {
+    const res = await shareResource(arg)
+    console.log('res', res)
+    if (res.code !== 200) {
+      message.error(`${res.msg || '分享失败'}`)
+    } else {
+      controlModal(false)
+      message.success('分享成功')
+    }
+  }
+
+  const watchShareInfo = () => {
+    if (shareInfo) {
+      openModal(ModalTypes.Share)
+    }
+  }
+
   const onSearch = async () => {
     if (searchInput) {
       const data = await search(searchInput)
       const highLightedData = highlightKeyWords(searchInput, data)
       setSearchResult(highLightedData)
     }
+  }
+
+  const onCloseModal = () => {
+    controlModal(false)
   }
 
   const highlightKeyWords = (keywords: string, result: SearchResult): SearchResult => {
@@ -269,6 +296,7 @@ function App() {
         login={<WyLayerLogin />}
         register={<WyLayerRegister />}
         like={<WyLayerLike likeId={likeId} sheet={userSheet} onLikeSong={onLikeSong} onCreateSheet={onCreateSheet} />}
+        share={<WyLayerShare shareInfo={shareInfo} onCancel={onCloseModal} onShare={onShare} />}
       />
     </Router>
   );

@@ -6,12 +6,12 @@ import { songTimeFormat, timeFormat } from "../../utils/timeFormat";
 import { PlayCircleOutlined, UpOutlined, DownOutlined } from "@ant-design/icons";
 import styles from "./index.module.less"
 import { Button, message, Table, Tag } from "antd";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectCurrentSong } from "../../redux/playerSlice";
 import { findIndex } from "../../utils/array";
 import { getSongList } from "../../services/song.service";
 import { controlModal, insertSong, insertSongs, likeSong, onPlaySheetBatch } from "../../services/batchAction.service";
-import { ModalTypes } from "../../redux/memberSlice";
+import { ModalTypes, setShareInfo } from "../../redux/memberSlice";
 import { likeSheet } from "../../services/member.service";
 
 interface SheetInfoParams {
@@ -65,6 +65,8 @@ export default function SheetInfo() {
   }
 
   const params = useParams<SheetInfoParams>()
+
+  const dispatch = useAppDispatch()
 
   const [sheetInfo, setSheetInfo] = useState<SongSheet | null>(null)
   const [description, setDescription] = useState<Description | null>(null)
@@ -151,6 +153,28 @@ export default function SheetInfo() {
     likeSong(id)
   }
 
+  const handleShareClick = (resource: Song | SongSheet | null, type = 'song') => {
+    if (resource) {
+      let txt = ''
+      if (type === 'playlist') {
+        txt = makeTxt('歌单', resource.name, (resource as SongSheet).creator.nickname)
+      } else {
+        txt = makeTxt('歌曲', resource.name, (resource as Song).ar)
+      }
+      dispatch(setShareInfo({ shareInfo: { id: resource.id.toString(), type, txt } }))
+    }
+  }
+
+  const makeTxt = (type: string, name: string, makeBy: string | Singer[]): string => {
+    let makeByStr = ''
+    if (Array.isArray(makeBy)) {
+      makeByStr = makeBy.map(item => item.name).join('/')
+    } else {
+      makeByStr = makeBy
+    }
+    return `${type}:${name}--${makeByStr}`
+  }
+
   const handleLikeSheetClick = async (id: number | undefined) => {
     if (id) {
       const res = await likeSheet(id.toString())
@@ -201,7 +225,7 @@ export default function SheetInfo() {
             <p className="icons">
               <i className="ico add" title="添加" onClick={() => { addSongToList(item) }}></i>
               <i className="ico like" title="收藏" onClick={() => { handleLikeSongClick(item.id.toString()) }}></i>
-              <i className="ico share" title="分享"></i>
+              <i className="ico share" title="分享" onClick={() => { handleShareClick(item) }}></i>
             </p>
           </div >
         ),
@@ -253,7 +277,7 @@ export default function SheetInfo() {
                 <Button className={[styles.btn, styles.like].join(' ')} onClick={() => { handleLikeSheetClick(sheetInfo?.id) }} disabled={sheetInfo?.subscribed}>
                   <span>收藏</span>({sheetInfo?.subscribedCount})
                 </Button>
-                <Button className={[styles.btn, styles.share].join(' ')}>
+                <Button className={[styles.btn, styles.share].join(' ')} onClick={() => { handleShareClick(sheetInfo, 'playlist') }}>
                   <span>分享</span>({sheetInfo?.shareCount})
                 </Button>
               </div>

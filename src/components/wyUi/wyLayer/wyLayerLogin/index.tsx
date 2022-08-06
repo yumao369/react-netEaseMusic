@@ -172,20 +172,25 @@ const MyFormTwo = () => {
        * status:
        * NOT SOLVED
        */}
-      <Form >
-        <FormItem name="phoneNumber" hasFeedback>
-          <Input name="phoneNumber" prefix={<MobileOutlined />} />
-        </FormItem>
-        <FormItem name="password" hasFeedback>
-          <Input.Password name="password" prefix={<LockOutlined />} />
-        </FormItem>
-        <FormItem name='remember'>
+      {({ errors, touched }) => {
+        console.log(errors, touched)
+        return (
+          <Form >
+            <FormItem name="phoneNumber" hasFeedback>
+              <Input name="phoneNumber" prefix={<MobileOutlined />} />
+            </FormItem>
+            <FormItem name="password" hasFeedback>
+              <Input.Password name="password" prefix={<LockOutlined />} />
+            </FormItem>
+            <FormItem name='remember'>
 
-          <Checkbox name="remember" >记住密码</Checkbox>
-          <SubmitButton type='primary' block={true} className={styles.login} >登陆</SubmitButton>
-        </FormItem>
+              <Checkbox name="remember" >记住密码</Checkbox>
+              <SubmitButton type='primary' block={true} className={styles.login} >登陆</SubmitButton>
+            </FormItem>
 
-      </Form>
+          </Form>
+        )
+      }}
     </Formik >
   )
 }

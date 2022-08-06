@@ -9,10 +9,17 @@ export enum ModalTypes {
   Default = 'default'
 }
 
+export type ShareInfo = {
+  id: string;
+  type: string;
+  txt: string;
+}
+
 export type MemberState = {
   modalVisible: boolean;
   modalType: ModalTypes;
   likeId: string;
+  shareInfo?: ShareInfo
 }
 
 export const defaultState: MemberState = {
@@ -33,14 +40,18 @@ export const memberSlice = createSlice({
     },
     setLikeId: (state, action: PayloadAction<{ likeId: string }>) => {
       return { ...state, likeId: action.payload.likeId }
+    },
+    setShareInfo: (state, action: PayloadAction<{ shareInfo: ShareInfo }>) => {
+      return { ...state, shareInfo: action.payload.shareInfo }
     }
   }
 })
 
-export const { setModalVisible, setModalType, setLikeId } = memberSlice.actions
+export const { setModalVisible, setModalType, setLikeId, setShareInfo } = memberSlice.actions
 
 export const selectModalVisible = (state: RootState) => state.memberReducer.modalVisible;
 export const selectModalType = (state: RootState) => state.memberReducer.modalType;
 export const selectLikeId = (state: RootState) => state.memberReducer.likeId;
+export const selectShareInfo = (state: RootState) => state.memberReducer.shareInfo;
 
 export default memberSlice.reducer

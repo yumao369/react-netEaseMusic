@@ -21,6 +21,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/react-transition-group": "^4.4.5",
     "@types/scroll-into-view": "^1.16.0",
+    "@types/yup": "^0.29.14",
     "antd": "^4.19.5",
     "axios": "^0.26.1",
     "babel-jest": "^27.4.2",
@@ -87,7 +88,8 @@
     "webpack": "^5.64.4",
     "webpack-dev-server": "^4.6.0",
     "webpack-manifest-plugin": "^4.0.2",
-    "workbox-webpack-plugin": "^6.4.1"
+    "workbox-webpack-plugin": "^6.4.1",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "node scripts/start.js",

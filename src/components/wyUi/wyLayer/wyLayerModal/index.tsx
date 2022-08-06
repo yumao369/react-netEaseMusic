@@ -16,6 +16,7 @@ interface WyLayerModalProps {
   login: React.ReactNode,
   register: React.ReactNode,
   like: React.ReactNode,
+  share: React.ReactNode,
   loadMySheets: () => Promise<void>
 }
 
@@ -140,6 +141,7 @@ export default function WyLayerModal(props: WyLayerModalProps) {
               .caseIs(ModalTypes.LoginByPhone, props.login)
               .caseIs(ModalTypes.Register, props.register)
               .caseIs(ModalTypes.Like, props.like)
+              .caseIs(ModalTypes.Share, props.share)
               .defaultAs(props.default)
           }
           <div className={styles.zcls} title="关闭" onClick={handleClose}></div>
