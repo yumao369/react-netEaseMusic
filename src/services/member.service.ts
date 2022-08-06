@@ -132,9 +132,21 @@ export const likeSheet = <T>(id: string, t = 1) => {
 }
 
 export const shareResource = <T>({ id, msg, type }: ShareParams) => {
-  return get<T>('share/resource', { id, msg, type })
+  return get<T>('/share/resource', { id, msg, type })
 }
 
 export const likeSinger = <T>(id: string, t: LikeSingerType) => {
-  return get<T>('artist/sub', { id, t })
+  return get<T>('/artist/sub', { id, t })
+}
+
+export const sendCode = <T>(phone: number) => {
+  return get<T>('/captcha/sent', { phone })
+}
+
+export const checkCode = <T>(phone: number, captcha: number) => {
+  return get<T>('/captcha/verify', { phone, captcha })
+}
+
+export const checkExist = <T>(phone: number) => {
+  return get<T>('/cellphone/existense/check', { phone })
 }
