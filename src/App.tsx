@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Redirect, useHistory, Link } from "react-router-dom";
-import { Layout, Menu, Input, Avatar, message } from "antd";
+import { Layout, Menu, Input, Avatar, message, BackTop } from "antd";
 import { MobileOutlined, UserAddOutlined, DownOutlined } from "@ant-design/icons";
 import Home from "./pages/home";
 import styles from "./App.module.less";
@@ -309,6 +309,7 @@ function App() {
         like={<WyLayerLike likeId={likeId} sheet={userSheet} onLikeSong={onLikeSong} onCreateSheet={onCreateSheet} />}
         share={<WyLayerShare shareInfo={shareInfo} onCancel={onCloseModal} onShare={onShare} />}
       />
+      <BackTop />
     </Router>
   );
 }
