@@ -26,6 +26,7 @@ import RecordDetail from "./pages/member/recordDetail";
 import WyLayerLike from "./components/wyUi/wyLayer/wyLayerLike";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import WyLayerShare from "./components/wyUi/wyLayer/wyLayerShare";
+import Page from "./Page";
 
 const { Header, Content, Footer } = Layout;
 const { SubMenu } = Menu;
@@ -41,6 +42,16 @@ const menu = [
     path: "/sheet",
   },
 ];
+
+export enum Title {
+  home = '首页',
+  sheet = '歌单',
+  sheetInfo = '歌单详情',
+  songInfo = '歌曲详情',
+  singerDetail = '歌手详情',
+  mycenter = '个人中心',
+  records = '听歌记录'
+}
 
 interface MemberProps {
   uid: string | null | undefined;
@@ -276,13 +287,13 @@ function App() {
               path="/"
               render={() => <Redirect to="/home" />}
             ></Route>
-            <Route path="/home" component={Home} />
-            <Route path="/sheet" component={Sheet} />
-            <Route path="/sheetInfo/:id" component={SheetInfo} />
-            <Route path="/songInfo/:id" component={SongInfo} />
-            <Route path="/singer/:id" component={SingerDetailCom} />
-            <Route path="/member/:id" component={MyCenter} />
-            <Route path="/records/:id" component={RecordDetail} />
+            <Route path="/home" render={() => <Page title={Title.home} component={Home} />} />
+            <Route path="/sheet" render={() => <Page title={Title.sheet} component={Sheet} />} />
+            <Route path="/sheetInfo/:id" render={() => <Page title={Title.sheetInfo} component={SheetInfo} />} />
+            <Route path="/songInfo/:id" render={() => <Page title={Title.songInfo} component={SongInfo} />} />
+            <Route path="/singer/:id" render={() => <Page title={Title.singerDetail} component={SingerDetailCom} />} />
+            <Route path="/member/:id" render={() => <Page title={Title.mycenter} component={MyCenter} />} />
+            <Route path="/records/:id" render={() => <Page title={Title.records} component={RecordDetail} />} />
           </Content>
           <Footer className={styles.footer}>
             Ant Design ©2022 Implement By React
