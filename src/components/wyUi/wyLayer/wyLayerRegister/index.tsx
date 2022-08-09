@@ -7,33 +7,49 @@ import styles from "./index.module.less"
 import { useAppDispatch } from "../../../../redux/hooks";
 import { ModalTypes, setModalType } from "../../../../redux/memberSlice";
 import { sendCode } from "../../../../services/member.service";
-import { interval } from "rxjs";
+import { interval, Subscription } from "rxjs";
 import { take } from "rxjs/internal/operators";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import WyCheckCode from "../wyCheckCode";
 
 export interface RegisterFormValue {
   phoneNumber: string,
   password: string
 }
 
-const MIN_PASSWORD = 6
+interface MyFormProps {
+  showCodeOnceSubmit: () => void;
+  changePhoneOnceSubmit: (phone: string) => void
+}
 
-const MyForm = () => {
+//always remember to move const out of component
+const MIN_PASSWORD = 6
+const defaultTiming = 60
+
+const MyForm = (props: MyFormProps) => {
   const initialValues: RegisterFormValue = { phoneNumber: '', password: '' }
 
-  const [timing, setTiming] = useState<number>(60)
+  const [timing, setTiming] = useState<number>(defaultTiming)
+  const intervalRef = useRef<null | Subscription>(null)
 
-  const interval$ = interval(1000)
+  const handleSendCodeRespSuccess = () => {
+    if (intervalRef.current) {
+      intervalRef.current.unsubscribe()
+      return
+    }
+    const subscription = interval(1000).pipe(take(60)).subscribe((prev) => { setTiming(prev - 1) })
+    intervalRef.current = subscription
+  }
 
-  useEffect(() => {
-  })
 
   const sendCodeOnceSubmit = async (phone: number) => {
     const res = await sendCode(phone)
     if (res.code !== 200) {
       message.error(`${res.message}`)
     } else {
-      interval$.pipe(take(60)).subscribe(() => setTiming(timing - 1))
+      //interval$.pipe(take(60)).subscribe(() => setTiming(timing - 1))
+      props.showCodeOnceSubmit()
+      handleSendCodeRespSuccess()
     }
   }
 
@@ -48,7 +64,8 @@ const MyForm = () => {
       })}
       onSubmit={(values, actions) => {
         actions.setSubmitting(false)
-        console.log(values)
+        props.changePhoneOnceSubmit(values.phoneNumber)
+        sendCodeOnceSubmit(Number(values.phoneNumber))
       }}
     >
       {(props: FormikProps<RegisterFormValue>) => {
@@ -74,15 +91,33 @@ const MyForm = () => {
 export default function WyLayerRegister() {
   const dispatch = useAppDispatch()
 
+  const [showCode, setShowCode] = useState<boolean>(false)
+  const [phone, setPhone] = useState<string>('')
+
   const changeModalType = (modalType: ModalTypes) => {
+    setShowCode(false)
     dispatch(setModalType({ modalType: modalType }))
+  }
+
+  const showCodeOnceSubmit = () => {
+    setShowCode(true)
+  }
+
+  const changePhoneOnceSubmit = (phone: string) => {
+    setPhone(phone)
   }
 
   return (
     <div>
       <div className="login-phone modal-content">
         <div className="modal-wrap">
-          <MyForm />
+          {
+            !showCode ? (
+              <MyForm showCodeOnceSubmit={showCodeOnceSubmit} changePhoneOnceSubmit={changePhoneOnceSubmit} />
+            ) : (
+              <WyCheckCode phone={phone} />
+            )
+          }
         </div>
       </div>
 
