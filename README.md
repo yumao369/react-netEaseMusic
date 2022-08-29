@@ -86,3 +86,4 @@ https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7
 about route resolve:
 https://blog.csdn.net/hui8758/article/details/110142559
 https://angular.io/api/router/Resolve
+image.png
