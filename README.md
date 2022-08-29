@@ -87,7 +87,7 @@ about route resolve:
 https://blog.csdn.net/hui8758/article/details/110142559
 https://angular.io/api/router/Resolve
 
-项目简介：
+## 项目简介：
 该项目实现了一个react版本的网易云音乐软件，包含7个页面，如下：
 
 1、home页
@@ -118,6 +118,16 @@ https://angular.io/api/router/Resolve
 
 登录之后界面如下：
 ![image](https://github.com/yumao369/react-netEaseMusic/blob/13-2/src/assets/images/readmeimg/9.PNG)
+
+## 启动接口
+git clone [https://github.com/Binaryify/NeteaseCloudMusicApi]
+npm i
+npm start
+
+## 项目启动
+git clone [https://github.com/yumao369/react-netEaseMusic.git]
+npm i
+npm start
 
 
 
