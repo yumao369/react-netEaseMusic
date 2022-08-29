@@ -120,14 +120,14 @@ https://angular.io/api/router/Resolve
 ![image](https://github.com/yumao369/react-netEaseMusic/blob/13-2/src/assets/images/readmeimg/9.PNG)
 
 ## 启动接口
-git clone [https://github.com/Binaryify/NeteaseCloudMusicApi]
-npm i
-npm start
+git clone [https://github.com/Binaryify/NeteaseCloudMusicApi]\
+npm i\
+npm start\
 
 ## 项目启动
-git clone [https://github.com/yumao369/react-netEaseMusic.git]
-npm i
-npm start
+git clone [https://github.com/yumao369/react-netEaseMusic.git]\
+npm i\
+npm start\
 
 
 
